@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-linen: #F9F7F2;
+  --color-brand-white: #FFFFFF;
+  --color-brand-gold: #AE875B;
+  --color-brand-gold-dark: #8F6A40;
+  --color-brand-gold-light: #C9A87C;
+  --color-brand-turquoise: #00A7D4;
+  --color-brand-turquoise-dark: #008AA0;
+  --color-brand-turquoise-light: #38C7EC;
+  --color-brand-dark: #0D131A;
+  --color-brand-navy: #151F2A;
+  --color-brand-gray: #4A5568;
+  --color-brand-gray-light: #718096;
+  --color-brand-sand: #EFECE6;
+
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-display: "Cinzel", "Playfair Display", serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Custom Utilities */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Glass & Texture */
+.linen-texture {
+  background-color: #0D131A;
+  background-image: radial-gradient(#AE875B 0.6px, transparent 0.6px), radial-gradient(#AE875B 0.6px, #0D131A 0.6px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  opacity: 0.98;
+}
+
+.linen-card {
+  background-color: #151F2A;
+  border: 1px solid rgba(174, 135, 91, 0.25);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #F9F7F2;
+}
+
+.linen-card:hover {
+  border-color: rgba(174, 135, 91, 0.6);
+  box-shadow: 0 15px 35px -5px rgba(0, 167, 212, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D131A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #AE875B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A87C;
+}
+
+/* Mayan cross pattern accent */
+.mayan-pattern-bg {
+  background-image: repeating-linear-gradient(45deg, rgba(174, 135, 91, 0.08) 0px, rgba(174, 135, 91, 0.08) 2px, transparent 2px, transparent 10px);
+}
+

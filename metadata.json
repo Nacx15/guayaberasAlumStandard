@@ -1,0 +1,8 @@
+{
+  "name": "Remix Guayaberas ALUM - Alta Costura Yucateca",
+  "description": "Tienda en línea de Guayaberas de lino premium y ropa típica yucateca confeccionada artesanalmente en Tekit, Yucatán por Alan Uicab Medina.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
