@@ -133,7 +133,7 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
                 </h3>
 
                 <!-- Coupon Input Form -->
-                <div class="space-y-2">
+                <!-- <div class="space-y-2">
                   <label for="coupon-code" class="block text-xs font-bold text-stone-200 uppercase tracking-wider">Cupón de Descuento</label>
                   
                   @if (cartService.appliedCoupon(); as c) {
@@ -158,7 +158,7 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
                     </div>
                     <p class="text-[10px] text-stone-400">Prueba con: <strong>TEKIT10</strong> (10% desc.)</p>
                   }
-                </div>
+                </div> -->
 
                 <!-- Price Breakdown -->
                 <div class="space-y-3 pt-4 border-t border-stone-800 text-xs">

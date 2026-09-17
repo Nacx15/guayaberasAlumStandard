@@ -202,46 +202,7 @@ import { Product } from '../../models/product.model';
                   }
                 </div>
 
-                <!-- REAL-TIME STOCK INVENTORY VALIDATION BOX -->
-                <div class="mt-6 p-4.5 rounded-2xl border transition-all"
-                     [class]="selectedVariantStock().stockDisponible > 0 ? 'bg-[#0D131A] border-emerald-800/80 shadow-md' : 'bg-[#0D131A] border-stone-800'">
-                  
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="w-3 h-3 rounded-full flex items-center justify-center"
-                            [class]="selectedVariantStock().stockDisponible > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'"></span>
-                      <span class="text-xs font-bold text-white uppercase tracking-wider">
-                        {{ selectedVariantStock().stockDisponible > 0 
-                          ? 'Existencia Inmediata en Bodega (' + selectedVariantStock().stockDisponible + ' piezas)' 
-                          : 'Sin Stock Inmediato para esta combinación' }}
-                      </span>
-                    </div>
-
-                    @if (selectedVariantStock().sku) {
-                      <span class="text-[10px] font-mono text-[#AE875B] font-semibold">SKU: {{ selectedVariantStock().sku }}</span>
-                    }
-                  </div>
-
-                  <!-- Detailed Inventory Breakdown -->
-                  <div class="mt-3.5 grid grid-cols-4 gap-2 text-center text-xs">
-                    <div class="p-2.5 bg-[#151F2A] rounded-xl border border-stone-800">
-                      <p class="text-[10px] text-stone-400 font-medium uppercase">En Bodega</p>
-                      <p class="font-bold text-white text-sm mt-0.5">{{ selectedVariantStock().qtyBodega }}</p>
-                    </div>
-                    <div class="p-2.5 bg-[#151F2A] rounded-xl border border-stone-800">
-                      <p class="text-[10px] text-stone-400 font-medium uppercase">Apartado</p>
-                      <p class="font-bold text-amber-300 text-sm mt-0.5">{{ selectedVariantStock().qtyApartado }}</p>
-                    </div>
-                    <div class="p-2.5 bg-[#151F2A] rounded-xl border border-stone-800">
-                      <p class="text-[10px] text-stone-400 font-medium uppercase">Disponible</p>
-                      <p class="font-bold text-emerald-400 text-sm mt-0.5">{{ selectedVariantStock().stockDisponible }}</p>
-                    </div>
-                    <div class="p-2.5 bg-[#151F2A] rounded-xl border border-stone-800">
-                      <p class="text-[10px] text-stone-400 font-medium uppercase">Producción</p>
-                      <p class="font-bold text-[#38C7EC] text-sm mt-0.5">{{ selectedVariantStock().qtyProduccion }}</p>
-                    </div>
-                  </div>
-                </div>
+                <!-- REAL-TIME STOCK INVENTORY VALIDATION BOX -->                
 
                 <!-- Quantity & Actions -->
                 <div class="mt-6 space-y-3">

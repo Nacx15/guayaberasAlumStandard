@@ -579,7 +579,7 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2">
                         <span class="text-sm font-bold text-white">Venta por WhatsApp</span>
-                        <span class="text-[10px] bg-[#25D366] text-black px-2 py-0.5 rounded-full font-bold">ERP Directo</span>
+                        <span class="text-[10px] bg-[#25D366] text-black px-2 py-0.5 rounded-full font-bold">Trato Directo</span>
                       </div>
                       <p class="text-[11px] text-stone-300 mt-1">Atención directa con taller, registro en ERP y pago guiado.</p>
                     </div>
@@ -601,10 +601,10 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
                   <div class="p-4 bg-[#0D131A] rounded-2xl border border-[#25D366]/30 text-xs space-y-2">
                     <div class="flex items-center gap-2 text-[#25D366] font-semibold">
                       <span class="material-icons text-base">support_agent</span>
-                      <span>Registro de Pedido en ERP & Atención por WhatsApp (+52 997 114 9132)</span>
+                      <span>Registro de Pedido & Atención por WhatsApp (+52 997 114 9132)</span>
                     </div>
                     <p class="text-stone-300 text-[11px] leading-relaxed">
-                      El pedido se registrará automáticamente en el ERP a través del endpoint oficial <code class="text-stone-200 bg-stone-900 px-1 py-0.5 rounded">/api/payment/create-whatsapp-order</code>, generará tu folio de venta y abrirá WhatsApp con el mensaje estructurado para confirmar detalles con Alan Uicab.
+                      El pedido se registrará automáticamente, se generará tu folio de venta y abrirá WhatsApp con el mensaje estructurado para confirmar detalles con Alan Uicab.
                     </p>
                   </div>
                 }
