@@ -1,7 +1,64 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { ProductCard } from '../../components/product-card/product-card';
+
+
+interface HomeCategoryCard {
+  key: string;
+  department: string;
+  title: string;
+  eyebrow: string;
+  description: string;
+  image: string;
+  alt: string;
+  accentClass: string;
+  hoverClass: string;
+  order: number;
+}
+
+const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 'department'>> = {
+  caballeros: {
+    title: 'CABALLERO',
+    eyebrow: 'Clásico & Moderno',
+    description: 'Prendas pensadas para él, manga corta y manga larga.',
+    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1000&auto=format&fit=crop',
+    alt: 'Guayaberas Caballero',
+    accentClass: 'text-[#00A7D4]',
+    hoverClass: 'group-hover:text-[#C9A87C]',
+    order: 1
+  },
+  damas: {
+    title: 'DAMA',
+    eyebrow: 'Bordados Finos',
+    description: 'Prendas pensadas para ella, vestidos elegantes y casuales.',
+    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=1000&auto=format&fit=crop',
+    alt: 'Vestidos y Blusas Dama',
+    accentClass: 'text-[#C9A87C]',
+    hoverClass: 'group-hover:text-[#00A7D4]',
+    order: 2
+  },
+  ninos: {
+    title: 'NIÑO',
+    eyebrow: 'Tradición Familiar',
+    description: 'Prendas pensadas para el más pequeño, manga corta y manga larga.',
+    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop',
+    alt: 'Línea Infantil Niño',
+    accentClass: 'text-[#C9A87C]',
+    hoverClass: 'group-hover:text-[#00A7D4]',
+    order: 3
+  },
+  ninas: {
+    title: 'NIÑA',
+    eyebrow: 'Tradición Familiar',
+    description: 'Prendas pensadas para la más pequeña, vestidos y blusas.',
+    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop',
+    alt: 'Línea Infantil Niña',
+    accentClass: 'text-[#C9A87C]',
+    hoverClass: 'group-hover:text-[#00A7D4]',
+    order: 4
+  }
+};
 
 @Component({
   selector: 'app-home',
@@ -118,7 +175,7 @@ import { ProductCard } from '../../components/product-card/product-card';
         </div>
       </section>
 
-      <!-- FEATURED CATEGORIES (Caballeros, Damas, Niños, Bodas) -->
+      <!-- FEATURED CATEGORIES (dinámicas desde el catálogo real) -->
       <section class="py-16 sm:py-24 bg-[#0D131A] border-b border-stone-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
@@ -133,97 +190,24 @@ import { ProductCard } from '../../components/product-card/product-card';
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            
-            <!-- Category 1: Caballeros -->
-            <a routerLink="/catalogo" [queryParams]="{cat: 'caballeros'}"
-               class="group relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-stone-800 hover:border-[#AE875B]/60 transition-all duration-300">
-              <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1000&auto=format&fit=crop" 
-                   alt="Guayaberas Caballero"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/40 to-transparent"></div>
-              
-              <div class="absolute inset-x-5 bottom-5 text-white">
-                <span class="text-[10px] uppercase font-bold tracking-widest text-[#00A7D4]">Clásico & Moderno</span>
-                <h3 class="font-serif text-2xl font-bold mt-0.5 group-hover:text-[#C9A87C] transition-colors">CABALLERO</h3>
-                <p class="text-xs text-stone-300 mt-1 line-clamp-2">Prendas pensadas para él, manga corta y manga larga.</p>
-                <span class="inline-flex items-center gap-1 text-xs font-bold text-[#00A7D4] mt-3 group-hover:translate-x-1 transition-transform">
-                  Ver Colección <span class="material-icons text-xs">arrow_forward</span>
-                </span>
-              </div>
-            </a>
+            @for (category of categoryCards(); track category.key) {
+              <a routerLink="/catalogo" [queryParams]="{cat: category.department}"
+                 class="group relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-stone-800 hover:border-[#AE875B]/60 transition-all duration-300">
+                <img [src]="category.image"
+                     [alt]="category.alt"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/40 to-transparent"></div>
 
-            <!-- Category 2: Damas -->
-            <a routerLink="/catalogo" [queryParams]="{cat: 'damas'}"
-               class="group relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-stone-800 hover:border-[#AE875B]/60 transition-all duration-300">
-              <img src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=1000&auto=format&fit=crop" 
-                   alt="Vestidos y Blusas Dama"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/40 to-transparent"></div>
-              
-              <div class="absolute inset-x-5 bottom-5 text-white">
-                <span class="text-[10px] uppercase font-bold tracking-widest text-[#C9A87C]">Bordados Finos</span>
-                <h3 class="font-serif text-2xl font-bold mt-0.5 group-hover:text-[#00A7D4] transition-colors">DAMA</h3>
-                <p class="text-xs text-stone-300 mt-1 line-clamp-2">Prendas pensadas para ella, vestidos elegantes y casuales.</p>
-                <span class="inline-flex items-center gap-1 text-xs font-bold text-[#C9A87C] mt-3 group-hover:translate-x-1 transition-transform">
-                  Ver Colección <span class="material-icons text-xs">arrow_forward</span>
-                </span>
-              </div>
-            </a>
-
-            <!-- Category 3: Bodas & Ceremonias -->
-            <!-- <a routerLink="/catalogo" [queryParams]="{cat: 'bodas'}"
-               class="group relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-stone-800 hover:border-[#AE875B]/60 transition-all duration-300">
-              <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop" 
-                   alt="Colección Bodas"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/40 to-transparent"></div>
-              
-              <div class="absolute inset-x-5 bottom-5 text-white">
-                <span class="text-[10px] uppercase font-bold tracking-widest text-[#00A7D4]">Novios & Padrinos</span>
-                <h3 class="font-serif text-2xl font-bold mt-0.5 group-hover:text-[#C9A87C] transition-colors">Bodas en Playa</h3>
-                <p class="text-xs text-stone-300 mt-1 line-clamp-2">Lino irlandés blanco y marfil para haciendas y playa.</p>
-                <span class="inline-flex items-center gap-1 text-xs font-bold text-[#00A7D4] mt-3 group-hover:translate-x-1 transition-transform">
-                  Ver Colección <span class="material-icons text-xs">arrow_forward</span>
-                </span>
-              </div>
-            </a> -->
-
-            <!-- Category 4: Niños (niño)-->
-            <a routerLink="/catalogo" [queryParams]="{cat: 'ninos'}"
-               class="group relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-stone-800 hover:border-[#AE875B]/60 transition-all duration-300">
-              <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop" 
-                   alt="Línea Infantil"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/40 to-transparent"></div>
-              
-              <div class="absolute inset-x-5 bottom-5 text-white">
-                <span class="text-[10px] uppercase font-bold tracking-widest text-[#C9A87C]">Tradición Familiar</span>
-                <h3 class="font-serif text-2xl font-bold mt-0.5 group-hover:text-[#00A7D4] transition-colors">NIÑO</h3>
-                <p class="text-xs text-stone-300 mt-1 line-clamp-2">Prendas pensadas para el más pequeño, manga corta y manga larga.</p>
-                <span class="inline-flex items-center gap-1 text-xs font-bold text-[#C9A87C] mt-3 group-hover:translate-x-1 transition-transform">
-                  Ver Colección <span class="material-icons text-xs">arrow_forward</span>
-                </span>
-              </div>
-            </a>
-
-            <!-- Category 4: Niños (niño)-->
-            <a routerLink="/catalogo" [queryParams]="{cat: 'ninos'}"
-               class="group relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-stone-800 hover:border-[#AE875B]/60 transition-all duration-300">
-              <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop" 
-                   alt="Línea Infantil"
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/40 to-transparent"></div>
-              
-              <div class="absolute inset-x-5 bottom-5 text-white">
-                <span class="text-[10px] uppercase font-bold tracking-widest text-[#C9A87C]">Tradición Familiar</span>
-                <h3 class="font-serif text-2xl font-bold mt-0.5 group-hover:text-[#00A7D4] transition-colors">NIÑA</h3>
-                <p class="text-xs text-stone-300 mt-1 line-clamp-2">Prendas pensadas para la mas pequeña, vestidos y blusas.</p>
-                <span class="inline-flex items-center gap-1 text-xs font-bold text-[#C9A87C] mt-3 group-hover:translate-x-1 transition-transform">
-                  Ver Colección <span class="material-icons text-xs">arrow_forward</span>
-                </span>
-              </div>
-            </a>
-
+                <div class="absolute inset-x-5 bottom-5 text-white">
+                  <span class="text-[10px] uppercase font-bold tracking-widest {{ category.accentClass }}">{{ category.eyebrow }}</span>
+                  <h3 class="font-serif text-2xl font-bold mt-0.5 {{ category.hoverClass }} transition-colors">{{ category.title }}</h3>
+                  <p class="text-xs text-stone-300 mt-1 line-clamp-2">{{ category.description }}</p>
+                  <span class="inline-flex items-center gap-1 text-xs font-bold {{ category.accentClass }} mt-3 group-hover:translate-x-1 transition-transform">
+                    Ver Colección <span class="material-icons text-xs">arrow_forward</span>
+                  </span>
+                </div>
+              </a>
+            }
           </div>
         </div>
       </section>
@@ -405,5 +389,65 @@ import { ProductCard } from '../../components/product-card/product-card';
 })
 export class Home {
   private productService = inject(ProductService);
+
+  readonly categoryCards = computed<HomeCategoryCard[]>(() => {
+    const categories = new Map<string, { department: string; image?: string }>();
+
+    for (const product of this.productService.products()) {
+      const department = String(product.departamento || product.category || '').trim();
+      if (!department) continue;
+
+      const key = this.categoryKey(department);
+      if (!categories.has(key)) {
+        categories.set(key, {
+          department,
+          image: product.images?.find(Boolean)
+        });
+      }
+    }
+
+    return Array.from(categories.entries())
+      .map(([key, source]) => {
+        const presentation = HOME_CATEGORY_PRESENTATION[key];
+
+        if (presentation) {
+          return {
+            key,
+            department: source.department,
+            ...presentation
+          };
+        }
+
+        return {
+          key,
+          department: source.department,
+          title: source.department.toLocaleUpperCase('es-MX'),
+          eyebrow: 'Colección ALUM',
+          description: `Descubre nuestra colección de ${source.department}.`,
+          image: source.image || 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=1000&auto=format&fit=crop',
+          alt: `Colección ${source.department}`,
+          accentClass: 'text-[#C9A87C]',
+          hoverClass: 'group-hover:text-[#00A7D4]',
+          order: 99
+        };
+      })
+      .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, 'es'));
+  });
+
   featuredProducts = this.productService.getFeaturedProducts().slice(0, 4);
+
+  private categoryKey(value: string): string {
+    const normalized = value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLocaleLowerCase('es-MX');
+
+    if (normalized.includes('caballer')) return 'caballeros';
+    if (normalized.includes('dama')) return 'damas';
+    if (normalized.includes('nina')) return 'ninas';
+    if (normalized.includes('nino')) return 'ninos';
+
+    return normalized.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
 }

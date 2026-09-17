@@ -631,10 +631,16 @@ export class Catalogo {
   constructor() {
     this.route.queryParams.subscribe(params => {
       if (params['cat']) {
-        const cat = params['cat'].toLowerCase();
-        if (cat.includes('caballero')) this.selectedDepartment.set('Caballeros');
-        else if (cat.includes('dama')) this.selectedDepartment.set('Damas');
-        else if (cat.includes('nino') || cat.includes('niño')) this.selectedDepartment.set('Niños');
+        const rawCategory = String(params['cat']).trim();
+        const cat = rawCategory
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLocaleLowerCase('es-MX');
+
+        if (cat === 'caballeros') this.selectedDepartment.set('Caballeros');
+        else if (cat === 'damas') this.selectedDepartment.set('Damas');
+        else if (cat === 'ninos') this.selectedDepartment.set('Niños');
+        else this.selectedDepartment.set(rawCategory);
       }
       if (params['q']) {
         this.searchFilter.set(params['q']);
