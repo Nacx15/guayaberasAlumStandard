@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { ProductCard } from '../../components/product-card/product-card';
-import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model';
+import { ApiColor, ApiDepartamento, ApiManga, Product, ProductVariant } from '../../models/product.model';
 
 @Component({
   selector: 'app-catalogo',
@@ -141,10 +141,10 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
               </button>
             }
 
-            @if (maxPriceFilter() < 1500) {
-              <button (click)="maxPriceFilter.set(1500)"
+            @if (isPriceFilterActive()) {
+              <button (click)="maxPriceFilter.set(null)"
                       class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-800 text-stone-200 font-semibold text-[11px] border border-stone-700">
-                <span>Máx: \${{ maxPriceFilter() }} MXN</span>
+                <span>Máx: \${{ effectiveMaxPrice() | number:'1.0-0' }} MXN</span>
                 <span class="material-icons text-xs">close</span>
               </button>
             }
@@ -231,7 +231,7 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
                     </span>
                   </button>
 
-                  @for (dept of availableDepartments(); track dept.id) {
+                  @for (dept of availableDepartments(); track dept.name) {
                     <button (click)="selectedDepartment.set(dept.name)"
                             class="w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all text-left"
                             [class]="selectedDepartment() === dept.name ? 'bg-[#00A7D4]/20 text-[#38C7EC] font-bold border border-[#00A7D4]/40' : 'text-stone-300 hover:bg-[#0D131A]'">
@@ -245,23 +245,25 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
               </div>
 
               <!-- 3. Tipos de Manga Filter -->
-              <div class="space-y-1.5 pt-2 border-t border-stone-800">
-                <span class="block text-xs font-bold text-stone-200 uppercase tracking-wider">Tipo de Manga</span>
-                <div class="grid grid-cols-2 gap-1.5">
-                  <button (click)="selectedManga.set('all')"
-                          class="py-1.5 px-2 rounded-lg text-[11px] font-semibold text-center transition-colors"
-                          [class]="selectedManga() === 'all' ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 hover:bg-stone-800 border border-stone-700'">
-                    Todas
-                  </button>
-                  @for (manga of availableMangas(); track manga.id) {
-                    <button (click)="toggleManga(manga.name)"
-                            class="py-1.5 px-2 rounded-lg text-[11px] font-semibold text-center transition-colors truncate"
-                            [class]="selectedManga() === manga.name ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 hover:bg-stone-800 border border-stone-700'">
-                      {{ manga.name }}
+              @if (availableMangas().length > 0) {
+                <div class="space-y-1.5 pt-2 border-t border-stone-800">
+                  <span class="block text-xs font-bold text-stone-200 uppercase tracking-wider">Tipo de Manga</span>
+                  <div class="grid grid-cols-2 gap-1.5">
+                    <button (click)="selectedManga.set('all')"
+                            class="py-1.5 px-2 rounded-lg text-[11px] font-semibold text-center transition-colors"
+                            [class]="selectedManga() === 'all' ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 hover:bg-stone-800 border border-stone-700'">
+                      Todas
                     </button>
-                  }
+                    @for (manga of availableMangas(); track manga.name) {
+                      <button (click)="toggleManga(manga.name)"
+                              class="py-1.5 px-2 rounded-lg text-[11px] font-semibold text-center transition-colors truncate"
+                              [class]="selectedManga() === manga.name ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 hover:bg-stone-800 border border-stone-700'">
+                        {{ manga.name }}
+                      </button>
+                    }
+                  </div>
                 </div>
-              </div>
+              }
 
               <!-- 4. Colores Filter (Visual Swatches) -->
               <div class="space-y-1.5 pt-2 border-t border-stone-800">
@@ -272,7 +274,7 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
                   }
                 </div>
                 <div class="flex flex-wrap gap-2 pt-1">
-                  @for (col of availableColors(); track col.id) {
+                  @for (col of availableColors(); track col.name) {
                     <button (click)="toggleColor(col.name)"
                             class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all border"
                             [class]="selectedColor() === col.name 
@@ -308,24 +310,27 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
               </div>
 
               <!-- 6. Price Range Filter -->
-              <div class="space-y-1.5 pt-2 border-t border-stone-800">
-                <div class="flex items-center justify-between text-xs font-bold text-stone-200 uppercase tracking-wider">
-                  <label for="price-range">Precio Máximo</label>
-                  <span class="text-[#C9A87C] font-bold">\${{ maxPriceFilter() | number:'1.0-0' }} MXN</span>
+              @if (priceBounds().max > 0) {
+                <div class="space-y-1.5 pt-2 border-t border-stone-800">
+                  <div class="flex items-center justify-between text-xs font-bold text-stone-200 uppercase tracking-wider">
+                    <label for="price-range">Precio Máximo</label>
+                    <span class="text-[#C9A87C] font-bold">\${{ effectiveMaxPrice() | number:'1.0-0' }} MXN</span>
+                  </div>
+                  <input id="price-range"
+                         type="range"
+                         [min]="priceBounds().min"
+                         [max]="priceBounds().max"
+                         [step]="priceStep()"
+                         [value]="effectiveMaxPrice()"
+                         [disabled]="priceBounds().min === priceBounds().max"
+                         (input)="updateMaxPrice($event)"
+                         class="w-full accent-[#00A7D4] cursor-pointer disabled:opacity-50 disabled:cursor-default" />
+                  <div class="flex justify-between text-[10px] text-stone-400">
+                    <span>\${{ priceBounds().min | number:'1.0-0' }} MXN</span>
+                    <span>\${{ priceBounds().max | number:'1.0-0' }} MXN</span>
+                  </div>
                 </div>
-                <input id="price-range"
-                       type="range" 
-                       min="20" 
-                       max="1500" 
-                       step="20"
-                       [value]="maxPriceFilter()"
-                       (input)="updateMaxPrice($event)"
-                       class="w-full accent-[#00A7D4] cursor-pointer" />
-                <div class="flex justify-between text-[10px] text-stone-400">
-                  <span>$20 MXN</span>
-                  <span>$1,500 MXN</span>
-                </div>
-              </div>
+              }
 
             </div>
           </aside>
@@ -470,7 +475,7 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
                   </span>
                 </button>
 
-                @for (dept of availableDepartments(); track dept.id) {
+                @for (dept of availableDepartments(); track dept.name) {
                   <button (click)="selectedDepartment.set(dept.name)"
                           class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all text-left"
                           [class]="selectedDepartment() === dept.name ? 'bg-[#00A7D4]/20 text-[#38C7EC] font-bold border border-[#00A7D4]/40' : 'text-stone-300 hover:bg-[#0D131A]'">
@@ -484,29 +489,31 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
             </div>
 
             <!-- Tipos de Manga -->
-            <div class="space-y-2 pt-3 border-t border-stone-800">
-              <span class="block text-xs font-bold text-stone-200 uppercase tracking-wider">Tipo de Manga</span>
-              <div class="grid grid-cols-2 gap-2">
-                <button (click)="selectedManga.set('all')"
-                        class="py-2 px-2 text-xs font-semibold text-center rounded-xl transition-colors"
-                        [class]="selectedManga() === 'all' ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 border border-stone-700'">
-                  Todas
-                </button>
-                @for (manga of availableMangas(); track manga.id) {
-                  <button (click)="toggleManga(manga.name)"
-                          class="py-2 px-2 text-xs font-semibold text-center rounded-xl transition-colors truncate"
-                          [class]="selectedManga() === manga.name ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 border border-stone-700'">
-                    {{ manga.name }}
+            @if (availableMangas().length > 0) {
+              <div class="space-y-2 pt-3 border-t border-stone-800">
+                <span class="block text-xs font-bold text-stone-200 uppercase tracking-wider">Tipo de Manga</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <button (click)="selectedManga.set('all')"
+                          class="py-2 px-2 text-xs font-semibold text-center rounded-xl transition-colors"
+                          [class]="selectedManga() === 'all' ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 border border-stone-700'">
+                    Todas
                   </button>
-                }
+                  @for (manga of availableMangas(); track manga.name) {
+                    <button (click)="toggleManga(manga.name)"
+                            class="py-2 px-2 text-xs font-semibold text-center rounded-xl transition-colors truncate"
+                            [class]="selectedManga() === manga.name ? 'bg-[#AE875B] text-white' : 'bg-[#0D131A] text-stone-300 border border-stone-700'">
+                      {{ manga.name }}
+                    </button>
+                  }
+                </div>
               </div>
-            </div>
+            }
 
             <!-- Colores -->
             <div class="space-y-2 pt-3 border-t border-stone-800">
               <span class="block text-xs font-bold text-stone-200 uppercase tracking-wider">Color</span>
               <div class="flex flex-wrap gap-2">
-                @for (col of availableColors(); track col.id) {
+                @for (col of availableColors(); track col.name) {
                   <button (click)="toggleColor(col.name)"
                           class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border"
                           [class]="selectedColor() === col.name 
@@ -535,24 +542,27 @@ import { ApiColor, ApiDepartamento, ApiManga } from '../../models/product.model'
             </div>
 
             <!-- Price Range -->
-            <div class="space-y-2 pt-3 border-t border-stone-800">
-              <div class="flex items-center justify-between text-xs font-bold text-stone-200 uppercase tracking-wider">
-                <label for="mobile-drawer-price">Precio Máximo</label>
-                <span class="text-[#C9A87C] font-bold">\${{ maxPriceFilter() | number:'1.0-0' }} MXN</span>
+            @if (priceBounds().max > 0) {
+              <div class="space-y-2 pt-3 border-t border-stone-800">
+                <div class="flex items-center justify-between text-xs font-bold text-stone-200 uppercase tracking-wider">
+                  <label for="mobile-drawer-price">Precio Máximo</label>
+                  <span class="text-[#C9A87C] font-bold">\${{ effectiveMaxPrice() | number:'1.0-0' }} MXN</span>
+                </div>
+                <input id="mobile-drawer-price"
+                       type="range"
+                       [min]="priceBounds().min"
+                       [max]="priceBounds().max"
+                       [step]="priceStep()"
+                       [value]="effectiveMaxPrice()"
+                       [disabled]="priceBounds().min === priceBounds().max"
+                       (input)="updateMaxPrice($event)"
+                       class="w-full accent-[#00A7D4] cursor-pointer disabled:opacity-50 disabled:cursor-default" />
+                <div class="flex justify-between text-[10px] text-stone-400">
+                  <span>\${{ priceBounds().min | number:'1.0-0' }} MXN</span>
+                  <span>\${{ priceBounds().max | number:'1.0-0' }} MXN</span>
+                </div>
               </div>
-              <input id="mobile-drawer-price"
-                     type="range" 
-                     min="20" 
-                     max="1500" 
-                     step="20"
-                     [value]="maxPriceFilter()"
-                     (input)="updateMaxPrice($event)"
-                     class="w-full accent-[#00A7D4] cursor-pointer" />
-              <div class="flex justify-between text-[10px] text-stone-400">
-                <span>$20 MXN</span>
-                <span>$1,500 MXN</span>
-              </div>
-            </div>
+            }
 
           </div>
 
@@ -585,57 +595,161 @@ export class Catalogo {
   selectedColor = signal<string>('all');
   selectedSize = signal<string>('all');
   onlyInStock = signal<boolean>(false);
-  maxPriceFilter = signal<number>(1500);
+  // null = sin límite manual: usa siempre el máximo real del response actual.
+  maxPriceFilter = signal<number | null>(null);
   searchFilter = signal<string>('');
   sortBy = signal<string>('featured');
   mobileFiltersOpen = signal<boolean>(false);
 
   readonly allProducts = computed(() => this.productService.getProducts());
 
+  /**
+   * Rango real de precios ecommerce presentes en los productos actuales.
+   * Productos sin ecommerce_price siguen visibles para su flujo de WhatsApp,
+   * pero no se usan para inventar límites de precio.
+   */
+  readonly priceBounds = computed(() => {
+    const prices = this.allProducts()
+      .map(product => Number(product.precio_ecommerce ?? product.price ?? 0))
+      .filter(price => Number.isFinite(price) && price > 0);
+
+    if (prices.length === 0) {
+      return { min: 0, max: 0 };
+    }
+
+    return {
+      min: Math.min(...prices),
+      max: Math.max(...prices)
+    };
+  });
+
+  readonly effectiveMaxPrice = computed(() => this.maxPriceFilter() ?? this.priceBounds().max);
+
+  readonly priceStep = computed(() => {
+    const { min, max } = this.priceBounds();
+    const range = Math.max(0, max - min);
+    if (range <= 200) return 10;
+    if (range <= 1000) return 25;
+    if (range <= 3000) return 50;
+    return 100;
+  });
+
+  readonly isPriceFilterActive = computed(() => {
+    const selected = this.maxPriceFilter();
+    return selected !== null && this.priceBounds().max > 0 && selected < this.priceBounds().max;
+  });
+
+  /**
+   * Departamentos presentes realmente en productos. También son contextuales:
+   * respetan los demás filtros activos, pero nunca dependen del catálogo general
+   * de departamentos si no hay productos asociados.
+   */
   readonly availableDepartments = computed<ApiDepartamento[]>(() => {
-    return this.productService.departamentos();
+    const byName = new Map<string, ApiDepartamento>();
+
+    for (const product of this.allProducts()) {
+      if (!this.productMatchesContext(product, 'department')) continue;
+
+      const name = String(product.departamento ?? '').trim();
+      if (!name) continue;
+      const key = this.normalize(name);
+      if (byName.has(key)) continue;
+
+      byName.set(key, {
+        id: Number(product.department_id ?? 0),
+        name,
+        description: null
+      });
+    }
+
+    return Array.from(byName.values());
   });
 
+  /** Manga únicamente si existe en los productos del response actual. */
   readonly availableMangas = computed<ApiManga[]>(() => {
-    return this.productService.mangas();
+    const byName = new Map<string, ApiManga>();
+
+    for (const product of this.allProducts()) {
+      if (!this.productMatchesContext(product, 'manga')) continue;
+
+      const name = String(product.manga ?? '').trim();
+      if (!name) continue;
+      const key = this.normalize(name);
+      if (byName.has(key)) continue;
+
+      byName.set(key, {
+        id: Number(product.manga_id ?? 0),
+        name
+      });
+    }
+
+    return Array.from(byName.values());
   });
 
+  /**
+   * Colores derivados de variantes reales. Si hay talla seleccionada, solo se
+   * muestran colores que tengan esa talla en la misma variante/combinación.
+   */
   readonly availableColors = computed<ApiColor[]>(() => {
-    return this.productService.colores();
-  });
+    const byName = new Map<string, ApiColor>();
+    const selectedSize = this.selectedSize();
 
-  readonly availableSizeNames = computed<string[]>(() => {
-    const tallas = this.productService.tallas();
-    const dept = this.selectedDepartment();
-    
-    if (dept !== 'all') {
-      const deptObj = this.availableDepartments().find(d => d.name === dept);
-      if (deptObj) {
-        const filtered = tallas.filter(t => t.department_id === deptObj.id);
-        if (filtered.length > 0) return Array.from(new Set(filtered.map(t => t.name)));
+    for (const product of this.allProducts()) {
+      if (!this.productMatchesContext(product, 'color')) continue;
+
+      for (const variant of product.variantes) {
+        if (selectedSize !== 'all' && !this.sameValue(variant.talla, selectedSize)) continue;
+        if (this.onlyInStock() && Number(variant.stockDisponible ?? 0) <= 0) continue;
+
+        const name = String(variant.color ?? '').trim();
+        if (!name) continue;
+        const key = this.normalize(name);
+        if (byName.has(key)) continue;
+
+        const productColor = product.colors.find(color => this.sameValue(color.name, name));
+        byName.set(key, {
+          id: Number(variant.color_id ?? productColor?.id ?? 0),
+          name,
+          hex_code: String(variant.hex || productColor?.hex || '#FFFFFF')
+        });
       }
     }
 
-    if (tallas && tallas.length > 0) {
-      return Array.from(new Set(tallas.map(t => t.name)));
+    return Array.from(byName.values());
+  });
+
+  /**
+   * Tallas derivadas de variantes reales. Si hay color seleccionado, solo se
+   * muestran tallas existentes para ese color en la misma variante.
+   */
+  readonly availableSizeNames = computed<string[]>(() => {
+    const sizes = new Map<string, string>();
+    const selectedColor = this.selectedColor();
+
+    for (const product of this.allProducts()) {
+      if (!this.productMatchesContext(product, 'size')) continue;
+
+      for (const variant of product.variantes) {
+        if (selectedColor !== 'all' && !this.sameValue(variant.color, selectedColor)) continue;
+        if (this.onlyInStock() && Number(variant.stockDisponible ?? 0) <= 0) continue;
+
+        const size = String(variant.talla ?? '').trim();
+        if (!size) continue;
+        const key = this.normalize(size);
+        if (!sizes.has(key)) sizes.set(key, size);
+      }
     }
 
-    // Fallback from products
-    const sizeSet = new Set<string>();
-    for (const p of this.allProducts()) {
-      for (const s of p.sizes) sizeSet.add(s);
-    }
-    return Array.from(sizeSet);
+    return Array.from(sizes.values()).sort((a, b) =>
+      a.localeCompare(b, 'es-MX', { numeric: true, sensitivity: 'base' })
+    );
   });
 
   constructor() {
     this.route.queryParams.subscribe(params => {
       if (params['cat']) {
         const rawCategory = String(params['cat']).trim();
-        const cat = rawCategory
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .toLocaleLowerCase('es-MX');
+        const cat = this.normalize(rawCategory);
 
         if (cat === 'caballeros') this.selectedDepartment.set('Caballeros');
         else if (cat === 'damas') this.selectedDepartment.set('Damas');
@@ -649,6 +763,39 @@ export class Catalogo {
         this.selectedManga.set(params['manga']);
       }
     });
+
+    // Si cambia el response o un filtro padre deja inválido otro filtro,
+    // limpiamos únicamente la selección que ya no existe. Durante la carga
+    // inicial no tocamos query params para evitar descartarlos antes del API.
+    effect(() => {
+      if (this.productService.apiStatus() !== 'connected') return;
+
+      const department = this.selectedDepartment();
+      if (department !== 'all' && !this.availableDepartments().some(item => this.sameValue(item.name, department))) {
+        this.selectedDepartment.set('all');
+      }
+
+      const manga = this.selectedManga();
+      if (manga !== 'all' && !this.availableMangas().some(item => this.sameValue(item.name, manga))) {
+        this.selectedManga.set('all');
+      }
+
+      const color = this.selectedColor();
+      if (color !== 'all' && !this.availableColors().some(item => this.sameValue(item.name, color))) {
+        this.selectedColor.set('all');
+      }
+
+      const size = this.selectedSize();
+      if (size !== 'all' && !this.availableSizeNames().some(item => this.sameValue(item, size))) {
+        this.selectedSize.set('all');
+      }
+
+      const max = this.maxPriceFilter();
+      const bounds = this.priceBounds();
+      if (max !== null && (bounds.max <= 0 || max >= bounds.max)) {
+        this.maxPriceFilter.set(null);
+      }
+    });
   }
 
   syncApi(): void {
@@ -660,7 +807,10 @@ export class Catalogo {
   }
 
   getDepartmentCount(deptName: string): number {
-    return this.allProducts().filter(p => p.departamento?.toLowerCase() === deptName.toLowerCase()).length;
+    return this.allProducts().filter(product =>
+      this.sameValue(product.departamento, deptName)
+      && this.productMatchesContext(product, 'department')
+    ).length;
   }
 
   readonly activeFiltersCount = computed(() => {
@@ -670,7 +820,7 @@ export class Catalogo {
     if (this.selectedColor() !== 'all') count++;
     if (this.selectedSize() !== 'all') count++;
     if (this.onlyInStock()) count++;
-    if (this.maxPriceFilter() < 1500) count++;
+    if (this.isPriceFilterActive()) count++;
     if (this.searchFilter().trim().length > 0) count++;
     return count;
   });
@@ -693,24 +843,24 @@ export class Catalogo {
     this.selectedColor.set('all');
     this.selectedSize.set('all');
     this.onlyInStock.set(false);
-    this.maxPriceFilter.set(1500);
+    this.maxPriceFilter.set(null);
     this.searchFilter.set('');
   }
 
   toggleOnlyInStock(): void {
-    this.onlyInStock.update(v => !v);
+    this.onlyInStock.update(value => !value);
   }
 
   toggleManga(mangaName: string): void {
-    this.selectedManga.set(this.selectedManga() === mangaName ? 'all' : mangaName);
+    this.selectedManga.set(this.sameValue(this.selectedManga(), mangaName) ? 'all' : mangaName);
   }
 
   toggleColor(colorName: string): void {
-    this.selectedColor.set(this.selectedColor() === colorName ? 'all' : colorName);
+    this.selectedColor.set(this.sameValue(this.selectedColor(), colorName) ? 'all' : colorName);
   }
 
   toggleSize(sizeName: string): void {
-    this.selectedSize.set(this.selectedSize() === sizeName ? 'all' : sizeName);
+    this.selectedSize.set(this.sameValue(this.selectedSize(), sizeName) ? 'all' : sizeName);
   }
 
   updateSearch(event: Event): void {
@@ -718,7 +868,9 @@ export class Catalogo {
   }
 
   updateMaxPrice(event: Event): void {
-    this.maxPriceFilter.set(+(event.target as HTMLInputElement).value);
+    const value = Number((event.target as HTMLInputElement).value);
+    const max = this.priceBounds().max;
+    this.maxPriceFilter.set(Number.isFinite(value) && value < max ? value : null);
   }
 
   onSortChange(event: Event): void {
@@ -726,88 +878,123 @@ export class Catalogo {
   }
 
   readonly filteredProducts = computed(() => {
-    let list = this.allProducts();
+    let list = this.allProducts().filter(product => this.productMatchesContext(product, null));
 
-    // 1. Department Filter
-    if (this.selectedDepartment() !== 'all') {
-      list = list.filter(p => p.departamento?.toLowerCase() === this.selectedDepartment().toLowerCase());
-    }
-
-    // 2. Manga Filter
-    if (this.selectedManga() !== 'all') {
-      list = list.filter(p => p.manga?.toLowerCase() === this.selectedManga().toLowerCase());
-    }
-
-    // 3. Color Filter
-    if (this.selectedColor() !== 'all') {
-      list = list.filter(p => p.colors.some(c => c.name.toLowerCase() === this.selectedColor().toLowerCase()));
-    }
-
-    // 4. Size Filter
-    if (this.selectedSize() !== 'all') {
-      list = list.filter(p => p.sizes.includes(this.selectedSize()));
-    }
-
-    // 5. Stock Validation Filter
-    if (this.onlyInStock()) {
-      list = list.filter(p => {
-        // If color or size selected, validate variant stock specifically
-        if (this.selectedColor() !== 'all' || this.selectedSize() !== 'all') {
-          return p.variantes.some(v => {
-            const matchesColor = this.selectedColor() === 'all' || v.color.toLowerCase() === this.selectedColor().toLowerCase();
-            const matchesSize = this.selectedSize() === 'all' || v.talla === this.selectedSize();
-            return matchesColor && matchesSize && v.stockDisponible > 0;
-          });
-        }
-        return p.inStock && p.totalStock > 0;
-      });
-    }
-
-    // 6. Max Price Filter
-    if (this.maxPriceFilter() < 1500) {
-      list = list.filter(p => {
-        const price = Number(p.precio_ecommerce ?? p.price ?? 0);
-        return price > 0 && price <= this.maxPriceFilter();
-      });
-    }
-
-    // 7. Search query
-    const q = this.searchFilter().trim().toLowerCase();
-    if (q) {
-      list = list.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        (p.ref_code && p.ref_code.toLowerCase().includes(q)) ||
-        (p.departamento && p.departamento.toLowerCase().includes(q)) ||
-        (p.manga && p.manga.toLowerCase().includes(q)) ||
-        p.embroideryType.toLowerCase().includes(q) ||
-        p.variantes.some(v => v.sku.toLowerCase().includes(q) || v.descripcion.toLowerCase().includes(q))
-      );
-    }
-
-    // 8. Sorting
     const sort = this.sortBy();
     if (sort === 'price-asc') {
       list = [...list].sort((a, b) => {
-        const aHas = Number(a.precio_ecommerce ?? a.price ?? 0) > 0;
-        const bHas = Number(b.precio_ecommerce ?? b.price ?? 0) > 0;
+        const aPrice = Number(a.precio_ecommerce ?? a.price ?? 0);
+        const bPrice = Number(b.precio_ecommerce ?? b.price ?? 0);
+        const aHas = aPrice > 0;
+        const bHas = bPrice > 0;
         if (!aHas && bHas) return 1;
         if (!bHas && aHas) return -1;
-        return a.price - b.price;
+        return aPrice - bPrice;
       });
     } else if (sort === 'price-desc') {
       list = [...list].sort((a, b) => {
-        const aHas = Number(a.precio_ecommerce ?? a.price ?? 0) > 0;
-        const bHas = Number(b.precio_ecommerce ?? b.price ?? 0) > 0;
+        const aPrice = Number(a.precio_ecommerce ?? a.price ?? 0);
+        const bPrice = Number(b.precio_ecommerce ?? b.price ?? 0);
+        const aHas = aPrice > 0;
+        const bHas = bPrice > 0;
         if (!aHas && bHas) return 1;
         if (!bHas && aHas) return -1;
-        return b.price - a.price;
+        return bPrice - aPrice;
       });
     } else if (sort === 'stock-desc') {
       list = [...list].sort((a, b) => b.totalStock - a.totalStock);
     } else if (sort === 'name-asc') {
-      list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+      list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'es-MX'));
     }
 
     return list;
   });
+
+  private productMatchesContext(
+    product: Product,
+    ignore: 'department' | 'manga' | 'color' | 'size' | 'price' | 'search' | null
+  ): boolean {
+    if (
+      ignore !== 'department'
+      && this.selectedDepartment() !== 'all'
+      && !this.sameValue(product.departamento, this.selectedDepartment())
+    ) {
+      return false;
+    }
+
+    if (
+      ignore !== 'manga'
+      && this.selectedManga() !== 'all'
+      && !this.sameValue(product.manga, this.selectedManga())
+    ) {
+      return false;
+    }
+
+    const selectedColor = ignore === 'color' ? 'all' : this.selectedColor();
+    const selectedSize = ignore === 'size' ? 'all' : this.selectedSize();
+    const requiresVariantMatch = selectedColor !== 'all' || selectedSize !== 'all' || this.onlyInStock();
+
+    if (requiresVariantMatch) {
+      const hasMatchingVariant = product.variantes.some(variant =>
+        this.variantMatches(variant, selectedColor, selectedSize, this.onlyInStock())
+      );
+      if (!hasMatchingVariant) return false;
+    }
+
+    if (ignore !== 'price' && this.isPriceFilterActive()) {
+      const productPrice = Number(product.precio_ecommerce ?? product.price ?? 0);
+      if (!(productPrice > 0 && productPrice <= this.effectiveMaxPrice())) {
+        return false;
+      }
+    }
+
+    if (ignore !== 'search') {
+      const query = this.normalize(this.searchFilter());
+      if (query) {
+        const searchable = [
+          product.name,
+          product.ref_code,
+          product.departamento,
+          product.manga,
+          product.embroideryType
+        ].map(value => this.normalize(value));
+
+        const matchesProduct = searchable.some(value => value.includes(query));
+        const matchesVariant = product.variantes.some(variant =>
+          this.normalize(variant.sku).includes(query)
+          || this.normalize(variant.descripcion).includes(query)
+          || this.normalize(variant.color).includes(query)
+          || this.normalize(variant.talla).includes(query)
+        );
+
+        if (!matchesProduct && !matchesVariant) return false;
+      }
+    }
+
+    return true;
+  }
+
+  private variantMatches(
+    variant: ProductVariant,
+    color: string,
+    size: string,
+    requireStock: boolean
+  ): boolean {
+    const matchesColor = color === 'all' || this.sameValue(variant.color, color);
+    const matchesSize = size === 'all' || this.sameValue(variant.talla, size);
+    const matchesStock = !requireStock || Number(variant.stockDisponible ?? 0) > 0;
+    return matchesColor && matchesSize && matchesStock;
+  }
+
+  private sameValue(left: unknown, right: unknown): boolean {
+    return this.normalize(left) === this.normalize(right);
+  }
+
+  private normalize(value: unknown): string {
+    return String(value ?? '')
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('es-MX');
+  }
 }

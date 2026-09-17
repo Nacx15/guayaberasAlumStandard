@@ -232,19 +232,25 @@ export class ProductService {
     }
 
     // 5. Department resolution
-    const deptName = apiProd.departamento || (apiProd.department_id === 2 ? 'Niños' : apiProd.department_id === 3 ? 'Damas' : 'Caballeros');
-    const categorySlug = deptName.toLowerCase();
+    // El departamento siempre debe provenir del response real de GuayaFlow.
+    // Si el producto solo trae department_id, resolvemos el nombre contra el catálogo
+    // incluido en la misma respuesta; nunca inventamos Caballeros/Damas/Niños.
+    const deptName = String(
+      apiProd.departamento
+      || catalogData.departamentos?.find(dept => dept.id === apiProd.department_id)?.name
+      || ''
+    ).trim();
+    const categorySlug = deptName.toLocaleLowerCase('es-MX');
 
     // 6. Manga resolution
-    let mangaName = apiProd.manga;
-    if (!mangaName) {
-      if (apiProd.manga_id) {
-        const m = catalogData.mangas?.find(mg => mg.id === apiProd.manga_id);
-        mangaName = m ? m.name : (apiProd.id % 2 === 0 ? 'Manga Corta' : 'Manga Larga');
-      } else {
-        mangaName = (apiProd.id === 3 || apiProd.id === 5 || apiProd.id === 6 || apiProd.id >= 8) ? 'Manga Corta' : 'Manga Larga';
-      }
-    }
+    // Igual que con departamento: únicamente usamos información contenida en el
+    // response. Si no existe manga/manga_id configurado, el producto queda sin manga
+    // y el filtro no mostrará valores ficticios.
+    const mangaName = String(
+      apiProd.manga
+      || catalogData.mangas?.find(manga => manga.id === apiProd.manga_id)?.name
+      || ''
+    ).trim() || undefined;
 
     // 7. Embroidery & Fabric Details
     let embroideryType = 'Alforzado Fino Artesanal';
@@ -282,7 +288,9 @@ export class ProductService {
       description: `La prenda "${apiProd.nombre}" (Ref: ${apiProd.ref_code}) es confeccionada en nuestro taller en Tekit, Yucatán. Cuenta con finos remates, alta transpirabilidad y acabados de lujo diseñados por Alan Uicab Medina.`,
       features: [
         `100% Lino fino pre-lavado y transpirable`,
-        `Corte exclusivo ${deptName} (${mangaName})`,
+        ...(deptName || mangaName
+          ? [`Corte exclusivo ${[deptName, mangaName ? `(${mangaName})` : ''].filter(Boolean).join(' ')}`]
+          : []),
         `Disponibilidad en almacén: ${stockBodega} pzas (Apartado: ${stockApartado})`,
         `Variantes en tallas: ${sizes.join(', ')}`,
         `Hecho 100% a mano en Tekit, Yucatán`
