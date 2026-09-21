@@ -9,6 +9,12 @@ export const environment = {
     products: 'https://api-multitenant.guayaflow.com/api/productos/ecommerce',
     createPreference: 'https://api-multitenant.guayaflow.com/api/payment/create-preference',
     createWhatsAppOrder: 'https://api-multitenant.guayaflow.com/api/payment/create-whatsapp-order',
+    category:{
+        caballeros: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1000&auto=format&fit=crop',
+        damas: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=1000&auto=format&fit=crop',
+        ninos: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop',
+        ninas: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?q=80&w=1000&auto=format&fit=crop',
+      }
   },
   images: {
     home: {
