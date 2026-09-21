@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { ProductCard } from '../../components/product-card/product-card';
+import { environment } from '../../../environments/environment';
 
 
 interface HomeCategoryCard {
@@ -71,7 +72,7 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
       <section class="relative pt-12 pb-20 sm:pt-20 sm:pb-28 overflow-hidden border-b border-[#AE875B]/25">
         <!-- Background image with blur and dark overlay -->
         <div class="absolute inset-0 pointer-events-none overflow-hidden">
-          <img src="https://assets.sm-panel.site/gallery/creacionesgolondrina/tienda_frente.jpeg" 
+          <img [src]="images.home.heroBackground" 
                alt="Fondo taller y artesanía textil" 
                class="w-full h-full object-cover" 
                referrerpolicy="no-referrer" />
@@ -104,17 +105,17 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
 
               <!-- CTA Buttons -->
               <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <a routerLink="/catalogo" 
+                <a routerLink="/inactive" 
                    class="w-full sm:w-auto px-8 py-4 bg-[#00A7D4] hover:bg-[#008AA0] text-white font-semibold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
                   <span class="material-icons text-lg">storefront</span>
-                  Explorar Catálogo
+                  inactive
                 </a>
 
-                <!-- <a routerLink="/maintenance" 
+                <a routerLink="/maintenance" 
                    class="w-full sm:w-auto px-8 py-4 bg-[#151F2A] hover:bg-[#1C2938] text-white border border-[#AE875B]/40 hover:border-[#AE875B] font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
                   <span class="material-icons text-lg text-[#C9A87C]">design_services</span>
                   maintenance
-                </a> -->
+                </a>
               </div>
 
               <!-- Key Value Metrics / Guarantees -->
@@ -141,7 +142,7 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
                 
                 <!-- Main Image Card -->
                 <div class="relative bg-[#151F2A] p-3 sm:p-4 rounded-3xl border border-[#AE875B]/40 shadow-2xl overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=1000&auto=format&fit=crop" 
+                  <img [src]="images.home.heroShowcase" 
                        alt="Guayabera de Gala ALUM Tekit" 
                        class="w-full h-[400px] sm:h-[480px] object-cover rounded-2xl" />
                   
@@ -285,10 +286,10 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-              <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=600&auto=format&fit=crop" 
+              <img [src]="images.home.craftsmanshipDetail" 
                    alt="Detalle de alforzas y botones de concha" 
                    class="w-full h-56 sm:h-72 object-cover rounded-2xl border border-[#AE875B]/30 shadow-lg" />
-              <img src="https://images.unsplash.com/photo-1620012253295-c15c429fcc71?q=80&w=600&auto=format&fit=crop" 
+              <img [src]="images.home.craftsmanshipWorkshop" 
                    alt="Taller de confección en Tekit" 
                    class="w-full h-56 sm:h-72 object-cover rounded-2xl border border-[#AE875B]/30 shadow-lg translate-y-6" />
             </div>
@@ -389,6 +390,7 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
 })
 export class Home {
   private productService = inject(ProductService);
+  readonly images = environment.images;
 
   constructor() {
     // Refresco comercial con ventana de frescura. Si GuayaFlow responde 403/503,

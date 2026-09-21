@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-nosotros',
@@ -31,7 +32,7 @@ import { RouterLink } from '@angular/router';
           <!-- Image Collage -->
           <div class="lg:col-span-6 relative">
             <div class="relative bg-[#151F2A] p-3 rounded-3xl border border-[#AE875B]/30 shadow-2xl overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop" 
+              <img [src]="images.nosotros.founderWorkshop" 
                    alt="Taller de guayaberas Tekit Alan Uicab" 
                    class="w-full h-[440px] object-cover rounded-2xl" />
               
@@ -98,7 +99,7 @@ import { RouterLink } from '@angular/router';
                 </p>
               </div>
               <div class="h-36 rounded-2xl overflow-hidden border border-stone-800">
-                <img src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover" alt="Lino puro" />
+                <img [src]="images.nosotros.processLinen" class="w-full h-full object-cover" alt="Lino puro" />
               </div>
             </div>
 
@@ -112,7 +113,7 @@ import { RouterLink } from '@angular/router';
                 </p>
               </div>
               <div class="h-36 rounded-2xl overflow-hidden border border-stone-800">
-                <img src="https://images.unsplash.com/photo-1620012253295-c15c429fcc71?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover" alt="Alforzado fino" />
+                <img [src]="images.nosotros.processPleating" class="w-full h-full object-cover" alt="Alforzado fino" />
               </div>
             </div>
 
@@ -126,7 +127,7 @@ import { RouterLink } from '@angular/router';
                 </p>
               </div>
               <div class="h-36 rounded-2xl overflow-hidden border border-stone-800">
-                <img src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover" alt="Bordado tradicional" />
+                <img [src]="images.nosotros.processEmbroidery" class="w-full h-full object-cover" alt="Bordado tradicional" />
               </div>
             </div>
 
@@ -140,7 +141,7 @@ import { RouterLink } from '@angular/router';
                 </p>
               </div>
               <div class="h-36 rounded-2xl overflow-hidden border border-stone-800">
-                <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover" alt="Acabados finales" />
+                <img [src]="images.nosotros.processFinishing" class="w-full h-full object-cover" alt="Acabados finales" />
               </div>
             </div>
 
@@ -198,4 +199,6 @@ import { RouterLink } from '@angular/router';
     </main>
   `
 })
-export class Nosotros {}
+export class Nosotros {
+  readonly images = environment.images;
+}
