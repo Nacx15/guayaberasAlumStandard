@@ -746,6 +746,14 @@ export class Catalogo {
   });
 
   constructor() {
+    // Catálogo participa como heartbeat natural del storefront: solo vuelve a
+    // consultar productos cuando venció la ventana corta de frescura.
+    this.productService.loadForNavigation().subscribe({
+      error: () => {
+        // 403/503 son gestionados globalmente por errorInterceptor.
+      }
+    });
+
     this.route.queryParams.subscribe(params => {
       if (params['cat']) {
         const rawCategory = String(params['cat']).trim();

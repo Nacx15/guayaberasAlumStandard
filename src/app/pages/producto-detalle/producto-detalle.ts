@@ -411,6 +411,16 @@ export class ProductoDetalle {
       const id = params.get('id') || '1';
       this.productId.set(id);
       this.initializeProductSelection(id);
+
+      // Cada navegación a un detalle usa la misma política de frescura que Home
+      // y Catálogo. Si la respuesta detecta maintenance/inactive, el interceptor
+      // global se encarga de cambiar el estado y redirigir.
+      this.productService.loadForNavigation().subscribe({
+        error: () => {
+          // Conservamos el último producto real mientras el manejo global actúa.
+        }
+      });
+
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       }

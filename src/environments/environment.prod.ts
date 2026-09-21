@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  tenant: 'alum_gf',
+  tenant: 'alum',
   apiUrl: 'https://api-multitenant.guayaflow.com/api',
   ecommerceStandardVersion: '1.0.0',
   useMock: false,

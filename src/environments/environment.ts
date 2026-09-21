@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  tenant: 'alum_gf',
+  tenant: 'alum',
   apiUrl: 'https://dev-api-nacx.guayaflow.com/api',
   ecommerceStandardVersion: '1.0.0',
   useMock: false,

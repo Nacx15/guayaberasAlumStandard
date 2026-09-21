@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, finalize, map, throwError, timeout } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, throwError, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   ApiColor,
@@ -80,6 +80,18 @@ export class ProductService {
   readonly lastSync = signal<Date | null>(null);
   readonly errorMessage = signal<string | null>(null);
 
+  /**
+   * Ventana corta para navegación comercial. Home/Catálogo/Detalle pueden usar
+   * el catálogo recién consultado sin repetir el GET en cada click, pero una
+   * navegación posterior vuelve a tocar GuayaFlow y permite que el
+   * errorInterceptor detecte maintenance/inactive mediante 503/403.
+   *
+   * Carrito/checkout NO usan esta ventana: llaman loadFromApi() directamente
+   * porque stock/precio deben revalidarse de forma forzada en puntos críticos.
+   */
+  private readonly navigationCatalogMaxAgeMs = 20_000;
+  private catalogRequestInFlight: Observable<Product[]> | null = null;
+
   constructor() {
     this.fetchFromApi();
   }
@@ -92,11 +104,41 @@ export class ProductService {
     });
   }
 
+  /**
+   * Carga usada por Home/Catálogo/Detalle. Reutiliza únicamente respuestas muy
+   * recientes; cuando vencen vuelve a consultar productos. De esta manera las
+   * llamadas de negocio funcionan también como heartbeat natural del tenant,
+   * sin volver a consultar /ecommerce/status en cada navegación.
+   */
+  loadForNavigation(maxAgeMs = this.navigationCatalogMaxAgeMs): Observable<Product[]> {
+    const lastSync = this.lastSync();
+    const ageMs = lastSync ? Date.now() - lastSync.getTime() : Number.POSITIVE_INFINITY;
+    const hasFreshCatalog =
+      this.apiStatus() === 'connected'
+      && lastSync !== null
+      && ageMs >= 0
+      && ageMs <= Math.max(0, maxAgeMs);
+
+    if (hasFreshCatalog) {
+      return of(this.products());
+    }
+
+    return this.loadFromApi();
+  }
+
+  /**
+   * Consulta forzada del catálogo real. Las llamadas concurrentes comparten un
+   * único request para evitar duplicados (por ejemplo, primera carga + Home).
+   */
   loadFromApi(): Observable<Product[]> {
+    if (this.catalogRequestInFlight) {
+      return this.catalogRequestInFlight;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    return this.http.get<ApiEcommerceResponse>(this.ENDPOINT_URL).pipe(
+    const request$ = this.http.get<ApiEcommerceResponse>(this.ENDPOINT_URL).pipe(
       timeout(12000),
       map((res) => {
         if (!res || !Array.isArray(res.productos)) {
@@ -111,8 +153,17 @@ export class ProductService {
         this.errorMessage.set('No fue posible cargar el catálogo real de GuayaFlow.');
         return throwError(() => error);
       }),
-      finalize(() => this.isLoading.set(false))
+      finalize(() => {
+        if (this.catalogRequestInFlight === request$) {
+          this.catalogRequestInFlight = null;
+        }
+        this.isLoading.set(false);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+
+    this.catalogRequestInFlight = request$;
+    return request$;
   }
 
   private processApiResponse(data: ApiEcommerceResponse, status: 'connected'): void {

@@ -228,7 +228,7 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          @for (product of featuredProducts; track product.id) {
+          @for (product of featuredProducts(); track product.id) {
             <app-product-card [product]="product"></app-product-card>
           }
         </div>
@@ -390,6 +390,16 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
 export class Home {
   private productService = inject(ProductService);
 
+  constructor() {
+    // Refresco comercial con ventana de frescura. Si GuayaFlow responde 403/503,
+    // el errorInterceptor actualiza el status y redirige sin consultar /status.
+    this.productService.loadForNavigation().subscribe({
+      error: () => {
+        // El interceptor/servicio global decide maintenance/inactive/error.
+      }
+    });
+  }
+
   readonly categoryCards = computed<HomeCategoryCard[]>(() => {
     const categories = new Map<string, { department: string; image?: string }>();
 
@@ -434,7 +444,7 @@ export class Home {
       .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, 'es'));
   });
 
-  featuredProducts = this.productService.getFeaturedProducts().slice(0, 4);
+  readonly featuredProducts = computed(() => this.productService.getFeaturedProducts().slice(0, 4));
 
   private categoryKey(value: string): string {
     const normalized = value
