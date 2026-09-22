@@ -7,13 +7,15 @@ import { WishlistService } from '../../services/wishlist.service';
 import { SizeGuideModal } from '../../components/size-guide-modal/size-guide-modal';
 import { ProductCard } from '../../components/product-card/product-card';
 import { Product } from '../../models/product.model';
+import { ShippingPromo } from '../../components/shipping-promo/shipping-promo';
 
 @Component({
   selector: 'app-producto-detalle',
-  imports: [RouterLink, DecimalPipe, SizeGuideModal, ProductCard],
+  imports: [RouterLink, DecimalPipe, SizeGuideModal, ProductCard, ShippingPromo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="min-h-screen bg-[#0D131A] text-[#F9F7F2] py-8 sm:py-12">
+      <app-shipping-promo></app-shipping-promo>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         @if (product(); as prod) {

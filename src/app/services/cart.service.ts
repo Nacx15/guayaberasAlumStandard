@@ -3,6 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { CartItem, Product, ProductVariant } from '../models/product.model';
 import { ProductService } from './product.service';
 import { ToastService } from './toast.service';
+import { EcommerceStatusService } from './ecommerce-status.service';
 
 export interface CartRevalidationResult {
   changed: boolean;
@@ -16,6 +17,7 @@ export class CartService {
   private readonly itemsSignal = signal<CartItem[]>(this.loadCartFromStorage());
   private readonly toastService = inject(ToastService);
   private readonly productService = inject(ProductService);
+  private readonly ecommerceStatus = inject(EcommerceStatusService);
   private revalidationInFlight: Promise<CartRevalidationResult> | null = null;
 
   readonly items = this.itemsSignal.asReadonly();
@@ -29,20 +31,22 @@ export class CartService {
     this.itemsSignal().reduce((total, item) => total + this.itemUnitPrice(item) * item.quantity, 0)
   );
 
-  readonly freeShippingThreshold = 1999;
+  readonly shippingEstimate = computed(() =>
+    this.ecommerceStatus.estimateShipping(this.totalItemsCount(), this.subtotal())
+  );
 
-  readonly shippingCost = computed(() => {
-    if (this.subtotal() === 0) return 0;
-    return this.subtotal() >= this.freeShippingThreshold ? 0 : 250;
-  });
+  /** Estimación UX; null significa que la configuración de shipping aún no es válida/cargada. */
+  readonly shippingCost = computed<number | null>(() => this.shippingEstimate()?.shippingCost ?? null);
 
   readonly discountAmount = signal<number>(0);
   readonly appliedCoupon = signal<string | null>(null);
 
-  readonly total = computed(() => {
+  readonly total = computed<number | null>(() => {
     const sub = this.subtotal();
+    const shipping = this.shippingCost();
     if (sub === 0) return 0;
-    return Math.max(0, sub + this.shippingCost() - this.discountAmount());
+    if (shipping === null) return null;
+    return Math.max(0, sub + shipping - this.discountAmount());
   });
 
   itemUnitPrice(item: CartItem): number {

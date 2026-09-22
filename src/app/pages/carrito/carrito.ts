@@ -4,10 +4,11 @@ import { DecimalPipe } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
 import { getApiErrorMessage } from '../../shared/http/api-error.util';
+import { ShippingPromo } from '../../components/shipping-promo/shipping-promo';
 
 @Component({
   selector: 'app-carrito',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, ShippingPromo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="min-h-screen bg-[#0D131A] text-[#F9F7F2] py-8 sm:py-12">
@@ -26,26 +27,7 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
 
         @if (cartService.totalItemsCount() > 0) {
           
-          <!-- Free Shipping Progress Indicator -->
-          <div class="bg-[#151F2A] p-4.5 rounded-2xl border border-[#AE875B]/30 shadow-md mb-8">
-            <div class="flex items-center justify-between text-xs font-semibold text-white mb-2">
-              <span class="flex items-center gap-1.5">
-                <span class="material-icons text-sm text-[#00A7D4]">local_shipping</span>
-                @if (cartService.subtotal() >= cartService.freeShippingThreshold) {
-                  <span class="text-emerald-400 font-bold">¡Felicidades! Tienes Envío Gratis a todo México.</span>
-                } @else {
-                  <span>
-                    Te faltan <strong class="text-[#C9A87C]">\${{ cartService.freeShippingThreshold - cartService.subtotal() | number:'1.2-2' }} MXN</strong> para obtener <strong>Envío Gratis</strong>
-                  </span>
-                }
-              </span>
-              <span class="text-[11px] text-stone-400">Monto Mínimo: $1,999 MXN</span>
-            </div>
-            <div class="w-full bg-[#0D131A] rounded-full h-2 overflow-hidden border border-stone-800">
-              <div class="bg-[#00A7D4] h-2 rounded-full transition-all duration-500"
-                   [style.width.%]="getProgressPercent()"></div>
-            </div>
-          </div>
+          <app-shipping-promo></app-shipping-promo>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
@@ -169,7 +151,9 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
 
                   <div class="flex items-center justify-between text-stone-300">
                     <span>Envío Estimado (Estafeta / DHL):</span>
-                    @if (cartService.shippingCost() === 0) {
+                    @if (cartService.shippingCost() === null) {
+                      <span class="font-bold text-stone-400">Por calcular</span>
+                    } @else if (cartService.shippingCost() === 0) {
                       <span class="font-bold text-emerald-400 uppercase">Gratis</span>
                     } @else {
                       <span class="font-bold text-white font-sans">\${{ cartService.shippingCost() | number:'1.2-2' }} MXN</span>
@@ -188,7 +172,7 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
                     <span class="text-base font-serif font-bold text-white">Total a Pagar:</span>
                     <div class="text-right">
                       <span class="text-2xl font-extrabold text-[#C9A87C] font-sans">
-                        \${{ cartService.total() | number:'1.2-2' }}
+                        @if (cartService.total() === null) { Por calcular } @else { \${{ cartService.total() | number:'1.2-2' }} }
                       </span>
                       <span class="text-xs text-stone-400 block">MXN (IVA Incluido)</span>
                     </div>
@@ -280,12 +264,6 @@ export class Carrito implements OnInit {
         6500
       );
     }
-  }
-
-  getProgressPercent(): number {
-    const sub = this.cartService.subtotal();
-    const target = this.cartService.freeShippingThreshold;
-    return Math.min(100, Math.round((sub / target) * 100));
   }
 
   applyCoupon(): void {

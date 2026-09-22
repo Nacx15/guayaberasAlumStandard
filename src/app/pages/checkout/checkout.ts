@@ -14,13 +14,17 @@ import {
 import { CartItem } from '../../models/product.model';
 import { CheckoutSessionService } from '../../services/checkout-session.service';
 import { getApiErrorMessage } from '../../shared/http/api-error.util';
+import { ShippingPromo } from '../../components/shipping-promo/shipping-promo';
+import { EcommerceStatusService } from '../../services/ecommerce-status.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-checkout',
-  imports: [RouterLink, DecimalPipe, JsonPipe],
+  imports: [RouterLink, DecimalPipe, JsonPipe, ShippingPromo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="min-h-screen bg-[#0D131A] text-[#F9F7F2] py-8 sm:py-12">
+      <app-shipping-promo></app-shipping-promo>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Breadcrumb & Header -->
@@ -647,7 +651,9 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
 
                   <div class="flex justify-between text-stone-300">
                     <span>Envío:</span>
-                    @if (cartService.shippingCost() === 0) {
+                    @if (cartService.shippingCost() === null) {
+                      <span class="font-semibold text-stone-400">Por calcular</span>
+                    } @else if (cartService.shippingCost() === 0) {
                       <span class="font-bold text-emerald-400 uppercase">Gratis</span>
                     } @else {
                       <span class="font-semibold text-white">\${{ cartService.shippingCost() | number:'1.2-2' }} MXN</span>
@@ -662,9 +668,9 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
                   }
 
                   <div class="pt-3 border-t border-stone-800 flex items-baseline justify-between">
-                    <span class="text-base font-serif font-bold text-white">Total Final:</span>
+                    <span class="text-base font-serif font-bold text-white">Total estimado:</span>
                     <span class="text-2xl font-extrabold text-[#C9A87C] font-sans">
-                      \${{ cartService.total() | number:'1.2-2' }} MXN
+                      @if (cartService.total() === null) { Por calcular } @else { \${{ cartService.total() | number:'1.2-2' }} MXN }
                     </span>
                   </div>
                 </div>
@@ -672,26 +678,26 @@ import { getApiErrorMessage } from '../../shared/http/api-error.util';
                 <!-- Submit Button Dynamic per Payment Method -->
                 @if (paymentMethod() === 'mercado_pago') {
                   <button type="submit" 
-                          [disabled]="isProcessing()"
+                          [disabled]="isProcessing() || cartService.shippingCost() === null"
                           class="w-full py-4 px-6 bg-[#00A7D4] hover:bg-[#0092BA] disabled:bg-stone-700 text-white font-bold text-sm uppercase tracking-wider rounded-xl shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed">
                     @if (isProcessing()) {
                       <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                       <span>Procesando Preferencia...</span>
                     } @else {
                       <span class="material-icons text-base">payment</span>
-                      <span>Pagar con Mercado Pago (\${{ cartService.total() | number:'1.2-2' }})</span>
+                      <span>Pagar con Mercado Pago @if (cartService.total() !== null) { (\${{ cartService.total() | number:'1.2-2' }}) }</span>
                     }
                   </button>
                 } @else {
                   <button type="submit" 
-                          [disabled]="isProcessing()"
+                          [disabled]="isProcessing() || cartService.shippingCost() === null"
                           class="w-full py-4 px-6 bg-[#25D366] hover:bg-[#20ba5a] disabled:bg-stone-700 text-black font-bold text-sm uppercase tracking-wider rounded-xl shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed">
                     @if (isProcessing()) {
                       <span class="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
                       <span>Guardando en ERP y Abriendo WhatsApp...</span>
                     } @else {
                       <span class="material-icons text-base">chat</span>
-                      <span>Finalizar por WhatsApp (\${{ cartService.total() | number:'1.2-2' }})</span>
+                      <span>Finalizar por WhatsApp @if (cartService.total() !== null) { (\${{ cartService.total() | number:'1.2-2' }}) }</span>
                     }
                   </button>
                 }
@@ -717,6 +723,7 @@ export class Checkout {
   readonly paymentService = inject(PaymentService);
   private toastService = inject(ToastService);
   private readonly checkoutSession = inject(CheckoutSessionService);
+  private readonly ecommerceStatus = inject(EcommerceStatusService);
   private readonly platformId = inject(PLATFORM_ID);
 
   // Form Signals
@@ -753,13 +760,16 @@ export class Checkout {
   /**
    * Genera el payload reactivo en tiempo real para Mercado Pago
    */
-  readonly currentRequestPayload = computed<MercadoPagoPreferenceRequest>(() => {
+  readonly currentRequestPayload = computed<MercadoPagoPreferenceRequest | null>(() => {
+    const shipping = this.cartService.shippingCost();
+    const total = this.cartService.total();
+    if (shipping === null || total === null) return null;
     return this.paymentService.buildPreferencePayload(
       this.cartService.items(),
       this.cartService.subtotal(),
-      this.cartService.shippingCost(),
+      shipping,
       this.cartService.discountAmount(),
-      this.cartService.total(),
+      total,
       {
         customer_name: this.customerName(),
         phone: this.customerPhone(),
@@ -777,13 +787,16 @@ export class Checkout {
   /**
    * Genera el payload reactivo en tiempo real para WhatsApp
    */
-  readonly currentWhatsAppRequestPayload = computed<WhatsAppOrderRequest>(() => {
+  readonly currentWhatsAppRequestPayload = computed<WhatsAppOrderRequest | null>(() => {
+    const shipping = this.cartService.shippingCost();
+    const total = this.cartService.total();
+    if (shipping === null || total === null) return null;
     return this.paymentService.buildWhatsAppPayload(
       this.cartService.items(),
       this.cartService.subtotal(),
-      this.cartService.shippingCost(),
+      shipping,
       this.cartService.discountAmount(),
-      this.cartService.total(),
+      total,
       {
         customer_name: this.customerName(),
         phone: this.customerPhone(),
@@ -986,6 +999,15 @@ export class Checkout {
     this.isProcessing.set(true);
 
     try {
+      await firstValueFrom(this.ecommerceStatus.refresh());
+      const shippingEstimate = this.cartService.shippingCost();
+      const totalEstimate = this.cartService.total();
+      if (shippingEstimate === null || totalEstimate === null) {
+        this.isProcessing.set(false);
+        this.toastService.show('No fue posible obtener la configuración de envío de GuayaFlow. Intenta nuevamente.', 'error', 6500);
+        return;
+      }
+
       const revalidation = await this.cartService.refreshAvailability();
 
       if (this.cartService.items().length === 0) {
@@ -1012,9 +1034,9 @@ export class Checkout {
         const payload = this.paymentService.buildWhatsAppPayload(
           validatedCartSnapshot,
           this.cartService.subtotal(),
-          this.cartService.shippingCost(),
+          shippingEstimate,
           this.cartService.discountAmount(),
-          this.cartService.total(),
+          totalEstimate,
           {
             customer_name: this.customerName(),
             phone: this.customerPhone(),
@@ -1077,9 +1099,9 @@ export class Checkout {
       const payload = this.paymentService.buildPreferencePayload(
         validatedCartSnapshot,
         this.cartService.subtotal(),
-        this.cartService.shippingCost(),
+        shippingEstimate,
         this.cartService.discountAmount(),
-        this.cartService.total(),
+        totalEstimate,
         {
           customer_name: this.customerName(),
           phone: this.customerPhone(),

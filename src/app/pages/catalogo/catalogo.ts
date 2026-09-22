@@ -4,13 +4,15 @@ import { DecimalPipe } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { ProductCard } from '../../components/product-card/product-card';
 import { ApiColor, ApiDepartamento, ApiManga, Product, ProductVariant } from '../../models/product.model';
+import { ShippingPromo } from '../../components/shipping-promo/shipping-promo';
 
 @Component({
   selector: 'app-catalogo',
-  imports: [RouterLink, ProductCard, DecimalPipe],
+  imports: [RouterLink, ProductCard, DecimalPipe, ShippingPromo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="min-h-screen bg-[#0D131A] text-[#F9F7F2] py-6 sm:py-10">
+      <app-shipping-promo></app-shipping-promo>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Breadcrumbs & Heading -->

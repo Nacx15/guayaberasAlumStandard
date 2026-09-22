@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { ProductCard } from '../../components/product-card/product-card';
 import { environment } from '../../../environments/environment';
+import { ShippingPromo } from '../../components/shipping-promo/shipping-promo';
 
 
 interface HomeCategoryCard {
@@ -63,10 +64,11 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, ProductCard],
+  imports: [RouterLink, ProductCard, ShippingPromo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="min-h-screen bg-[#0D131A] text-[#F9F7F2]">
+      <app-shipping-promo></app-shipping-promo>
       
       <!-- HERO BANNER (Fondo primario oscuro #0D131A con contrastes luminosos en #AE875B, #00A7D4 y #F9F7F2) -->
       <section class="relative pt-12 pb-20 sm:pt-20 sm:pb-28 overflow-hidden border-b border-[#AE875B]/25">
