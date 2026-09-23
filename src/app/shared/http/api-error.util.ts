@@ -46,7 +46,7 @@ export function getApiErrorMessage(
   }
 
   if (error.status === 0) {
-    return 'No pudimos conectar con GuayaFlow. Verifica tu conexión e intenta nuevamente.';
+    return 'No pudimos conectar con el servidor. Verifica tu conexión e intenta nuevamente.';
   }
 
   return body.mensajeError || body.message || body.error || fallback;

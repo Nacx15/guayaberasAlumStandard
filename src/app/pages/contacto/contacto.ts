@@ -67,7 +67,7 @@ import { ToastService } from '../../services/toast.service';
                 </li>
                 <li class="flex items-center gap-2">
                   <span class="material-icons text-sm text-[#38C7EC]">check_circle</span>
-                  <span>Lino 100% yucateco, algodón y mezclas finas</span>
+                  <span>Lino, algodón y mezclas finas</span>
                 </li>
                 <li class="flex items-center gap-2">
                   <span class="material-icons text-sm text-[#38C7EC]">check_circle</span>

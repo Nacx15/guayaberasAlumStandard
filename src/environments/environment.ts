@@ -1,15 +1,9 @@
 export const environment = {
   production: false,
-  tenant: 'alum',
-  apiUrl: 'https://dev-api-nacx.guayaflow.com/api',
+  tenant: 'larosa',
+  apiUrl: 'http://localhost:8000/api',
   ecommerceStandardVersion: '1.0.0',
   useMock: false,
-  endpoints: {
-    ecommerceStatus: 'https://dev-api-nacx.guayaflow.com/api/ecommerce/status',
-    products: 'https://dev-api-nacx.guayaflow.com/api/productos/ecommerce',
-    createPreference: 'https://dev-api-nacx.guayaflow.com/api/payment/create-preference',
-    createWhatsAppOrder: 'https://dev-api-nacx.guayaflow.com/api/payment/create-whatsapp-order',
-  },
   images: {
     home: {
       heroBackground: 'https://assets.sm-panel.site/gallery/creacionesgolondrina/tienda_frente.jpeg',

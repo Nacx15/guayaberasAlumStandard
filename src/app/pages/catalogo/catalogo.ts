@@ -51,11 +51,11 @@ import { ShippingPromo } from '../../components/shipping-promo/shipping-promo';
 
             <!-- Desktop Sorting Dropdown & Sync Button -->
             <div class="flex items-center gap-3">
-              <button (click)="syncApi()"
+              <!-- <button (click)="syncApi()"
                       class="sm:hidden px-3 py-2 bg-[#151F2A] border border-[#AE875B]/40 rounded-xl text-xs font-semibold text-stone-300 flex items-center gap-1">
                 <span class="material-icons text-sm" [class.animate-spin]="productService.isLoading()">sync</span>
                 <span>API</span>
-              </button>
+              </button> -->
 
               <label for="catalog-sort" class="text-xs font-semibold text-stone-300 whitespace-nowrap hidden sm:block">Ordenar por:</label>
               <select id="catalog-sort"

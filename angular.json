@@ -20,11 +20,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "security": {
-              "allowedHosts": [
-                "dev-alum-e.guayaflow.com"
-              ]
-            },
+            "outputPath": "dist/alum",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
@@ -75,11 +71,6 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": {
-            "allowedHosts": [
-              "dev-alum-e.guayaflow.com"
-            ]
-          },
           "configurations": {
             "production": {
               "buildTarget": "app:build:production"

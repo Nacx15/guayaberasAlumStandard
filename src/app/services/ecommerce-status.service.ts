@@ -96,7 +96,7 @@ export class EcommerceStatusService {
     this.loading.set(true);
 
     const request$ = this.http
-      .get<EcommerceStatusApiResponse>(environment.endpoints.ecommerceStatus)
+      .get<EcommerceStatusApiResponse>(`${environment.apiUrl}/ecommerce/status`)
       .pipe(
         map((response) => {
           const data = response?.data;

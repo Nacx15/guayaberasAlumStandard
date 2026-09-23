@@ -74,10 +74,12 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
       <section class="relative pt-12 pb-20 sm:pt-20 sm:pb-28 overflow-hidden border-b border-[#AE875B]/25">
         <!-- Background image with blur and dark overlay -->
         <div class="absolute inset-0 pointer-events-none overflow-hidden">
-          <img [src]="images.home.heroBackground" 
+          @if(images.home.heroBackground){
+            <img [src]="images.home.heroBackground" 
                alt="Fondo taller y artesanía textil" 
                class="w-full h-full object-cover" 
                referrerpolicy="no-referrer" />
+          }
           <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/75 to-[#0D131A]/90"></div>
           <!-- <div class="absolute inset-0 bg-[#0D131A]/40"></div> -->
         </div>
@@ -230,7 +232,7 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
           </a>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-6">
           @for (product of featuredProducts(); track product.id) {
             <app-product-card [product]="product"></app-product-card>
           }

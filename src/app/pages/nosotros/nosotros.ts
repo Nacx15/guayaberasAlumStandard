@@ -38,7 +38,7 @@ import { environment } from '../../../environments/environment';
               
               <div class="absolute bottom-6 left-6 bg-[#0D131A]/95 text-white p-4 rounded-2xl border border-[#AE875B]/40 max-w-xs backdrop-blur-md shadow-2xl">
                 <p class="text-xs font-bold text-[#C9A87C]">Alan Uicab Medina</p>
-                <p class="text-[11px] text-stone-300">Fundador & Maestro Sastre de Guayaberas ALUM</p>
+                <p class="text-[11px] text-stone-300">Fundador de Guayaberas ALUM</p>
               </div>
             </div>
           </div>
@@ -63,10 +63,10 @@ import { environment } from '../../../environments/environment';
                 <h4 class="font-serif font-bold text-lg text-[#C9A87C]">Tekit, Yucatán</h4>
                 <p class="text-xs text-stone-400 mt-1">Ubicación de nuestro taller matriz y sala de exhibición.</p>
               </div>
-              <!-- <div>
-                <h4 class="font-serif font-bold text-lg text-[#38C7EC]">100% Lino Fino</h4>
+              <div>
+                <h4 class="font-serif font-bold text-lg text-[#38C7EC]">Lino, Algodón y Chipre</h4>
                 <p class="text-xs text-stone-400 mt-1">Fibras naturales seleccionadas de la más alta pureza.</p>
-              </div> -->
+              </div>
             </div>
           </div>
 

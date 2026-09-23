@@ -57,7 +57,7 @@ type PaymentPageState = 'success' | 'failure' | 'pending';
             </h1>
           </div>
           <p class="text-sm sm:text-base text-stone-300 max-w-lg mx-auto leading-relaxed font-sans">
-            GuayaFlow confirmó el pago de tu pedido mediante el estado firmado y la conciliación de Mercado Pago.
+            Se confirmó el pago de tu pedido mediante el estado firmado y la conciliación de Mercado Pago.
           </p>
         } @else if (isTerminalFailure()) {
           <div class="space-y-2">
@@ -70,7 +70,7 @@ type PaymentPageState = 'success' | 'failure' | 'pending';
             </h1>
           </div>
           <p class="text-sm sm:text-base text-stone-300 max-w-lg mx-auto leading-relaxed font-sans">
-            Puedes recuperar el carrito. Antes de restaurarlo volveremos a validar precio y existencia con GuayaFlow.
+            Puedes recuperar el carrito. Antes de restaurarlo volveremos a validar precio y existencia.
           </p>
         } @else if (pageState === 'failure') {
           <div class="space-y-2">
@@ -83,7 +83,7 @@ type PaymentPageState = 'success' | 'failure' | 'pending';
             </h1>
           </div>
           <p class="text-sm sm:text-base text-stone-300 max-w-lg mx-auto leading-relaxed font-sans">
-            No generes otro pedido todavía. La URL de retorno no decide el resultado: esperaremos el estado real de GuayaFlow.
+            No generes otro pedido todavía. La URL de retorno no decide el resultado: esperaremos el estado real.
           </p>
         } @else {
           <div class="space-y-2">
@@ -166,7 +166,7 @@ type PaymentPageState = 'success' | 'failure' | 'pending';
           </p>
         } @else if (checking()) {
           <p class="text-xs text-stone-400 max-w-md mx-auto leading-relaxed pt-2">
-            Consultando el estado firmado del pedido en GuayaFlow…
+            Consultando el estado firmado del pedido…
           </p>
         }
       </div>
@@ -241,7 +241,7 @@ export class PaymentResultPage implements OnInit {
       }
 
       if (manual) {
-        this.toast.show('El pedido todavía no aparece como pagado o liberado en GuayaFlow.', 'info', 5000);
+        this.toast.show('El pedido todavía no aparece como pagado o liberado.', 'info', 5000);
       }
     } catch (error) {
       if (manual) {

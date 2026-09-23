@@ -173,7 +173,7 @@ import { firstValueFrom } from 'rxjs';
 
               <!-- Secondary Actions & Response JSON -->
               <div class="space-y-3 pt-2">
-                <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+                <!-- <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
                   <button (click)="toggleWhatsAppMessagePreview()" type="button"
                           class="text-xs text-stone-400 hover:text-[#25D366] underline flex items-center gap-1 cursor-pointer">
                     <span class="material-icons text-sm">visibility</span>
@@ -191,7 +191,7 @@ import { firstValueFrom } from 'rxjs';
                     <span class="material-icons text-sm">storefront</span>
                     Volver al Catálogo
                   </a>
-                </div>
+                </div> -->
 
                 @if (showMessagePreview()) {
                   <div class="mt-4 p-4 bg-[#090D12] rounded-2xl border border-stone-800 text-left font-mono text-[11px] text-stone-300 whitespace-pre-wrap max-h-64 overflow-y-auto">
@@ -205,8 +205,8 @@ import { firstValueFrom } from 'rxjs';
                 @if (showResponseJson()) {
                   <div class="mt-4 p-4 bg-[#090D12] rounded-2xl border border-stone-800 text-left font-mono text-[11px] overflow-x-auto text-emerald-400 max-h-64">
                     <div class="flex items-center justify-between pb-2 mb-2 border-b border-stone-800 font-sans text-xs">
-                      <span class="text-stone-400 font-bold">Respuesta del Endpoint ERP:</span>
-                      <code class="text-stone-300">{{ paymentService.WHATSAPP_ENDPOINT }}</code>
+                      <!-- <span class="text-stone-400 font-bold">Respuesta del Endpoint ERP:</span> -->
+                      <!-- <code class="text-stone-300">{{ paymentService.WHATSAPP_ENDPOINT }}</code> -->
                     </div>
                     <pre>{{ whatsAppResponse() | json }}</pre>
                   </div>
@@ -352,8 +352,8 @@ import { firstValueFrom } from 'rxjs';
                 @if (showResponseJson()) {
                   <div class="mt-4 p-4 bg-[#090D12] rounded-2xl border border-stone-800 text-left font-mono text-[11px] overflow-x-auto text-emerald-400 max-h-64">
                     <div class="flex items-center justify-between pb-2 mb-2 border-b border-stone-800 font-sans text-xs">
-                      <span class="text-stone-400 font-bold">Respuesta del Endpoint:</span>
-                      <code class="text-stone-300">{{ paymentService.API_ENDPOINT }}</code>
+                      <!-- <span class="text-stone-400 font-bold">Respuesta del Endpoint:</span>
+                      <code class="text-stone-300">{{ paymentService.API_ENDPOINT }}</code> -->
                     </div>
                     <pre>{{ preferenceResponse() | json }}</pre>
                   </div>
@@ -1004,7 +1004,7 @@ export class Checkout {
       const totalEstimate = this.cartService.total();
       if (shippingEstimate === null || totalEstimate === null) {
         this.isProcessing.set(false);
-        this.toastService.show('No fue posible obtener la configuración de envío de GuayaFlow. Intenta nuevamente.', 'error', 6500);
+        this.toastService.show('No fue posible obtener la configuración de envío. Intenta nuevamente.', 'error', 6500);
         return;
       }
 
@@ -1069,7 +1069,7 @@ export class Checkout {
             ) {
               this.isProcessing.set(false);
               this.toastService.show(
-                'GuayaFlow registró una respuesta incompleta para el pedido por WhatsApp. No se abrirá WhatsApp con totales no verificados.',
+                'Se registró una respuesta incompleta para el pedido por WhatsApp. No se abrirá WhatsApp con totales no verificados.',
                 'error',
                 7000
               );
@@ -1128,7 +1128,7 @@ export class Checkout {
             || !response.order_status_url
           ) {
             this.isProcessing.set(false);
-            this.toastService.show('GuayaFlow devolvió una preferencia incompleta. No se realizó el redirect.', 'error', 6500);
+            this.toastService.show('Se devolvió una preferencia incompleta. No se realizó el redirect.', 'error', 6500);
             return;
           }
 
@@ -1163,7 +1163,7 @@ export class Checkout {
       });
     } catch (error) {
       this.isProcessing.set(false);
-      this.toastService.show(getApiErrorMessage(error, 'No fue posible revalidar el carrito con GuayaFlow.'), 'error', 6500);
+      this.toastService.show(getApiErrorMessage(error, 'No fue posible revalidar el carrito.'), 'error', 6500);
     }
   }
 
@@ -1183,7 +1183,7 @@ export class Checkout {
           await this.cartService.refreshAvailability();
         } catch {
           this.toastService.show(
-            'GuayaFlow rechazó el pedido y no fue posible sincronizar el carrito en este momento. No se realizó el pago.',
+            'Se rechazó el pedido y no fue posible sincronizar el carrito en este momento. No se realizó el pago.',
             'error',
             7000
           );

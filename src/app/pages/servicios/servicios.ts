@@ -56,7 +56,7 @@ import { ToastService } from '../../services/toast.service';
               </ul>
             </div>
             <div class="pt-6 mt-6 border-t border-stone-800">
-              <a href="https://wa.me/529971149132?text=Hola,%20me%20gustar%C3%ADa%20cotizar%20una%20guayabera%20a%20la%20medida%20para%20un%20evento." 
+              <a href="https://wa.me/529971149132?text=Hola,%20Gauayaberas%20ALUM%20me%20gustar%C3%ADa%20cotizar%20una%20guayabera%20a%20la%20medida%20para%20un%20evento." 
                  target="_blank" rel="noopener"
                  class="inline-flex items-center gap-2 text-xs font-bold text-[#38C7EC] hover:text-[#00A7D4]">
                 Cotizar por WhatsApp <span class="material-icons text-sm">arrow_forward</span>
@@ -93,7 +93,7 @@ import { ToastService } from '../../services/toast.service';
               </ul>
             </div>
             <div class="pt-6 mt-6 border-t border-stone-800">
-              <a href="https://wa.me/529971149132?text=Hola,%20quisiera%20solicitar%20informaci%C3%B3n%20sobre%20bordados%20personalizados." 
+              <a href="https://wa.me/529971149132?text=Hola,%20Gauayaberas%20ALUM%20quisiera%20solicitar%20informaci%C3%B3n%20sobre%20bordados%20personalizados." 
                  target="_blank" rel="noopener"
                  class="inline-flex items-center gap-2 text-xs font-bold text-[#C9A87C] hover:text-[#AE875B]">
                 Solicitar bordado de autor <span class="material-icons text-sm">arrow_forward</span>
@@ -130,7 +130,7 @@ import { ToastService } from '../../services/toast.service';
               </ul>
             </div>
             <div class="pt-6 mt-6 border-t border-stone-800">
-              <a href="https://wa.me/529971149132?text=Hola,%20quisiera%20solicitar%20cotizaci%C3%B3n%20de%20mayoreo."     
+              <a href="https://wa.me/529971149132?text=Hola,%20Gauayaberas%20ALUM%20quisiera%20solicitar%20cotizaci%C3%B3n%20de%20mayoreo."     
                  target="_blank" rel="noopener"         
                  class="inline-flex items-center gap-2 text-xs font-bold text-[#38C7EC] hover:text-[#00A7D4]">
                 Solicitar catálogo de mayoreo <span class="material-icons text-sm">arrow_forward</span>

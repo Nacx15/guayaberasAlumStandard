@@ -63,7 +63,7 @@ import { ShippingPromo } from '../../components/shipping-promo/shipping-promo';
                     </div>
 
                     <p class="text-xs text-stone-400 pt-1 font-sans">
-                      100% Lino • Confeccionado en Tekit, Yuc.
+                      Lino • Confeccionado en Tekit, Yuc.
                     </p>
                   </div>
 

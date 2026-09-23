@@ -21,7 +21,7 @@ import { EcommerceStatusService } from '../../services/ecommerce-status.service'
                   <div class="h-full bg-[#00A7D4] transition-all duration-300" [style.width.%]="progressPercent()"></div>
                 </div>
               }
-              <p class="text-[11px] text-stone-500 mt-2">Costo estimado. GuayaFlow confirma el envío y total final al crear el pedido.</p>
+              <p class="text-[11px] text-stone-500 mt-2">Costo estimado. Se confirma el envío y total final al crear el pedido.</p>
             </div>
           </div>
         </div>

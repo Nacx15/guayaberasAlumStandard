@@ -67,7 +67,6 @@ const CURATED_IMAGES_BY_MODEL: Record<string, string[]> = {
 })
 export class ProductService {
   private http = inject(HttpClient);
-  readonly ENDPOINT_URL = environment.endpoints.products;
 
   readonly products = signal<Product[]>([]);
   readonly departamentos = signal<ApiDepartamento[]>([]);
@@ -138,7 +137,7 @@ export class ProductService {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const request$ = this.http.get<ApiEcommerceResponse>(this.ENDPOINT_URL).pipe(
+    const request$ = this.http.get<ApiEcommerceResponse>(`${environment.apiUrl}/productos/ecommerce`).pipe(
       timeout(12000),
       map((res) => {
         if (!res || !Array.isArray(res.productos)) {
@@ -150,7 +149,7 @@ export class ProductService {
       }),
       catchError((error: HttpErrorResponse | Error) => {
         this.apiStatus.set('error');
-        this.errorMessage.set('No fue posible cargar el catálogo real de GuayaFlow.');
+        this.errorMessage.set('No fue posible cargar el catálogo');
         return throwError(() => error);
       }),
       finalize(() => {
@@ -334,11 +333,11 @@ export class ProductService {
       isNew: apiProd.id <= 4,
       isFeatured: apiProd.id === 1 || apiProd.id === 2 || apiProd.id === 4 || apiProd.id === 8,
       isBestSeller: apiProd.id === 1 || apiProd.id === 3 || apiProd.id === 7,
-      fabric: '100% Lino Puro de Tekit',
+      fabric: 'Lino Puro de Tekit',
       shortDescription: `Confección artesanal yucateca con ${variants.length} variantes disponibles. Ref: ${apiProd.ref_code}.`,
       description: `La prenda "${apiProd.nombre}" (Ref: ${apiProd.ref_code}) es confeccionada en nuestro taller en Tekit, Yucatán. Cuenta con finos remates, alta transpirabilidad y acabados de lujo diseñados por Alan Uicab Medina.`,
       features: [
-        `100% Lino fino pre-lavado y transpirable`,
+        `Lino fino pre-lavado y transpirable`,
         ...(deptName || mangaName
           ? [`Corte exclusivo ${[deptName, mangaName ? `(${mangaName})` : ''].filter(Boolean).join(' ')}`]
           : []),

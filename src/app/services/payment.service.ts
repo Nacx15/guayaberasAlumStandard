@@ -16,9 +16,6 @@ import { CartItem } from '../models/product.model';
 export class PaymentService {
   private readonly http = inject(HttpClient);
 
-  readonly API_ENDPOINT = environment.endpoints.createPreference;
-  readonly WHATSAPP_ENDPOINT = environment.endpoints.createWhatsAppOrder;
-
   private formatCartItems(cartItems: CartItem[]): MercadoPagoItem[] {
     return cartItems.map((item) => {
       // selectedSize/selectedColor son la identidad canónica del renglón de carrito.
@@ -155,7 +152,7 @@ export class PaymentService {
     data: MercadoPagoPreferenceResponse;
     requestPayload: MercadoPagoPreferenceRequest;
   }> {
-    return this.http.post<MercadoPagoPreferenceResponse>(this.API_ENDPOINT, payload).pipe(
+    return this.http.post<MercadoPagoPreferenceResponse>(`${environment.apiUrl}/payment/create-preference`, payload).pipe(
       timeout(15000),
       map((response) => ({
         success: true as const,
@@ -170,7 +167,7 @@ export class PaymentService {
     data: WhatsAppOrderResponse;
     requestPayload: WhatsAppOrderRequest;
   }> {
-    return this.http.post<WhatsAppOrderResponse>(this.WHATSAPP_ENDPOINT, payload).pipe(
+    return this.http.post<WhatsAppOrderResponse>(`${environment.apiUrl}/payment/create-whatsapp-order`, payload).pipe(
       timeout(15000),
       map((response) => ({
         success: true as const,
