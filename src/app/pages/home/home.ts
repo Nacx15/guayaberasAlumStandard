@@ -109,17 +109,17 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
 
               <!-- CTA Buttons -->
               <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <a routerLink="/inactive" 
+                <a routerLink="/catalogo" 
                    class="w-full sm:w-auto px-8 py-4 bg-[#00A7D4] hover:bg-[#008AA0] text-white font-semibold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
                   <span class="material-icons text-lg">storefront</span>
-                  inactive
+                  Explorar Catálogo
                 </a>
 
-                <a routerLink="/maintenance" 
+                <!-- <a routerLink="/maintenance" 
                    class="w-full sm:w-auto px-8 py-4 bg-[#151F2A] hover:bg-[#1C2938] text-white border border-[#AE875B]/40 hover:border-[#AE875B] font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
                   <span class="material-icons text-lg text-[#C9A87C]">design_services</span>
                   maintenance
-                </a>
+                </a> -->
               </div>
 
               <!-- Key Value Metrics / Guarantees -->
