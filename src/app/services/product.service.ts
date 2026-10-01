@@ -335,15 +335,15 @@ export class ProductService {
       isBestSeller: apiProd.id === 1 || apiProd.id === 3 || apiProd.id === 7,
       fabric: 'Lino Puro de Tekit',
       shortDescription: `Confección artesanal yucateca con ${variants.length} variantes disponibles. Ref: ${apiProd.ref_code}.`,
-      description: `La prenda "${apiProd.nombre}" (Ref: ${apiProd.ref_code}) es confeccionada en nuestro taller en Tekit, Yucatán. Cuenta con finos remates, alta transpirabilidad y acabados de lujo diseñados por Alan Uicab Medina.`,
+      description: apiProd.descripcion,
       features: [
         `Lino fino pre-lavado y transpirable`,
         ...(deptName || mangaName
           ? [`Corte exclusivo ${[deptName, mangaName ? `(${mangaName})` : ''].filter(Boolean).join(' ')}`]
           : []),
-        `Disponibilidad en almacén: ${stockBodega} pzas (Apartado: ${stockApartado})`,
+        `Disponibilidad en almacén: ${stockBodega} pzas`,
         `Variantes en tallas: ${sizes.join(', ')}`,
-        `Hecho 100% a mano en Tekit, Yucatán`
+        `Hecho en Tekit, Yucatán`
       ],
       images,
       color_images: apiProd.color_images,

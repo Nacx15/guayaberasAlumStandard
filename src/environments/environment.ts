@@ -6,6 +6,11 @@ export const environment = {
   useMock: false,
   images: {
     home: {
+      heroSlides: {
+        slide1: 'http://127.0.0.1:9000/ecosistema-guayaberizate-prod/gallery/alum/tienda-principal.jpeg',
+        slide2: 'http://127.0.0.1:9000/ecosistema-guayaberizate-prod/gallery/alum/tienda-2.jpeg',
+        slide3: 'http://127.0.0.1:9000/ecosistema-guayaberizate-prod/gallery/alum/tienda-3.jpeg',
+      },
       heroBackground: 'https://assets.sm-panel.site/gallery/creacionesgolondrina/tienda_frente.jpeg',
       heroShowcase: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=1000&auto=format&fit=crop',
       craftsmanshipDetail: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=600&auto=format&fit=crop',

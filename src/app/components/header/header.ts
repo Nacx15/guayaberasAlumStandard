@@ -65,11 +65,11 @@ import { Product } from '../../models/product.model';
               Catálogo & Tienda
             </a>
 
-            <a routerLink="/nosotros" 
+            <!-- <a routerLink="/nosotros" 
                routerLinkActive="text-[#00A7D4] font-semibold after:scale-x-100"
                class="relative py-1 text-sm font-medium tracking-wide text-stone-200 hover:text-[#00A7D4] transition-colors after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#00A7D4] after:scale-x-0 hover:after:scale-x-100 after:transition-transform">
               Historia y Tradición
-            </a>
+            </a> -->
           </nav>
 
           <!-- Center Brand Logo -->

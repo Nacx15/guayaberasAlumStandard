@@ -74,7 +74,7 @@ import { environment } from '../../../environments/environment';
       </section>
 
       <!-- Craftsmanship & Production Process Gallery -->
-      <section class="py-16 bg-[#151F2A] border-y border-stone-800">
+      <section class="py-16 bg-[#151F2A] border-y border-stone-800" hidden>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div class="text-center max-w-2xl mx-auto mb-16">

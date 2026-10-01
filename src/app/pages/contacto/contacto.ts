@@ -233,7 +233,7 @@ import { ToastService } from '../../services/toast.service';
               <h3 class="font-serif font-bold text-2xl text-white">Ubicación de la Boutique en Tekit, Yucatán</h3>
               <p class="text-xs text-stone-300">Calle 21 x 32 y 32, Tekit, Yucatán, C.P. 97680</p>
             </div>
-            <a href="https://maps.google.com/?q=Tekit,+Yucat%C3%A1n" target="_blank" rel="noopener"
+            <a href="https://maps.app.goo.gl/DQMSnnVsznEebWfq7" target="_blank" rel="noopener"
                class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#AE875B] hover:bg-[#8F6A40] text-white text-xs font-bold rounded-xl transition-colors self-start sm:self-auto shadow-md">
               <span class="material-icons text-sm">directions</span>
               Cómo Llegar con Google Maps
@@ -243,7 +243,7 @@ import { ToastService } from '../../services/toast.service';
           <!-- Embed iframe of Tekit, Yucatan -->
           <div class="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-stone-800">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14948.868019318858!2d-89.33924765!3d20.536762!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5619caefbce8c3%3A0x6b6c0bfb2d416b25!2sTekit%2C%20Yuc.!5e0!3m2!1ses!2smx!4v1700000000000!5m2!1ses!2smx" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3736.247141065882!2d-89.33626129999999!3d20.5370666!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f56f77e5d83cc1d%3A0xb9341ce077af5d6c!2sGUAYABERAS%20ALUM!5e0!3m2!1ses!2smx!4v1790816501980!5m2!1ses!2smx" 
               width="100%" 
               height="100%" 
               style="border:0;" 

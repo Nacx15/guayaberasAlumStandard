@@ -28,6 +28,7 @@ export interface ApiProducto {
   id: number;
   nombre: string;
   ref_code: string;
+  descripcion: string;
   precio_publico: number;
   precio_ecommerce?: number;
   precio_mayoreo?: number;

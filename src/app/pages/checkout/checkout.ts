@@ -585,7 +585,7 @@ import { firstValueFrom } from 'rxjs';
                         <span class="text-sm font-bold text-white">Venta por WhatsApp</span>
                         <span class="text-[10px] bg-[#25D366] text-black px-2 py-0.5 rounded-full font-bold">Trato Directo</span>
                       </div>
-                      <p class="text-[11px] text-stone-300 mt-1">Atención directa con taller, registro en ERP y pago guiado.</p>
+                      <p class="text-[11px] text-stone-300 mt-1">Atención directa con tienda y pago guiado.</p>
                     </div>
                   </button>
                 </div>
@@ -598,7 +598,7 @@ import { firstValueFrom } from 'rxjs';
                       <span>Pasarela Segura con Mercado Pago (Endpoint Oficial)</span>
                     </div>
                     <p class="text-stone-300 text-[11px]">
-                      Al hacer clic en pagar, generaremos la preferencia con el Endpoint oficial y te redirigiremos a la pasarela segura para completar tu pago con tarjeta, transferencia SPEI o efectivo.
+                      Al hacer clic en pagar, generaremos la preferencia y te redirigiremos a la pasarela segura para completar tu pago con tarjeta, transferencia SPEI o efectivo.
                     </p>
                   </div>
                 } @else if (paymentMethod() === 'whatsapp') {
@@ -608,7 +608,7 @@ import { firstValueFrom } from 'rxjs';
                       <span>Registro de Pedido & Atención por WhatsApp (+52 997 114 9132)</span>
                     </div>
                     <p class="text-stone-300 text-[11px] leading-relaxed">
-                      El pedido se registrará automáticamente, se generará tu folio de venta y abrirá WhatsApp con el mensaje estructurado para confirmar detalles con Alan Uicab.
+                      El pedido se registrará automáticamente, se generará tu folio de venta y abrirá WhatsApp para confirmar detalles con Alan Uicab.
                     </p>
                   </div>
                 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { ProductCard } from '../../components/product-card/product-card';
@@ -12,7 +12,7 @@ interface HomeCategoryCard {
   title: string;
   eyebrow: string;
   description: string;
-  image: string;
+  image?: string;
   alt: string;
   accentClass: string;
   hoverClass: string;
@@ -24,7 +24,6 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
     title: 'CABALLERO',
     eyebrow: 'Clásico & Moderno',
     description: 'Prendas pensadas para él, manga corta y manga larga.',
-    image: environment.images.home.category.caballeros,
     alt: 'Guayaberas Caballero',
     accentClass: 'text-[#00A7D4]',
     hoverClass: 'group-hover:text-[#C9A87C]',
@@ -34,7 +33,6 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
     title: 'DAMA',
     eyebrow: 'Bordados Finos',
     description: 'Prendas pensadas para ella, vestidos elegantes y casuales.',
-    image: environment.images.home.category.damas,
     alt: 'Vestidos y Blusas Dama',
     accentClass: 'text-[#C9A87C]',
     hoverClass: 'group-hover:text-[#00A7D4]',
@@ -44,7 +42,6 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
     title: 'NIÑO',
     eyebrow: 'Tradición Familiar',
     description: 'Prendas pensadas para el más pequeño, manga corta y manga larga.',
-    image: environment.images.home.category.ninos,
     alt: 'Línea Infantil Niño',
     accentClass: 'text-[#C9A87C]',
     hoverClass: 'group-hover:text-[#00A7D4]',
@@ -54,7 +51,6 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
     title: 'NIÑA',
     eyebrow: 'Tradición Familiar',
     description: 'Prendas pensadas para la más pequeña, vestidos y blusas.',
-    image: environment.images.home.category.ninas,
     alt: 'Línea Infantil Niña',
     accentClass: 'text-[#C9A87C]',
     hoverClass: 'group-hover:text-[#00A7D4]',
@@ -70,112 +66,65 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
     <main class="min-h-screen bg-[#0D131A] text-[#F9F7F2]">
       <app-shipping-promo></app-shipping-promo>
       
-      <!-- HERO BANNER (Fondo primario oscuro #0D131A con contrastes luminosos en #AE875B, #00A7D4 y #F9F7F2) -->
-      <section class="relative pt-12 pb-20 sm:pt-20 sm:pb-28 overflow-hidden border-b border-[#AE875B]/25">
-        <!-- Background image with blur and dark overlay -->
-        <div class="absolute inset-0 pointer-events-none overflow-hidden">
-          @if(images.home.heroBackground){
-            <img [src]="images.home.heroBackground" 
-               alt="Fondo taller y artesanía textil" 
-               class="w-full h-full object-cover" 
-               referrerpolicy="no-referrer" />
+      <!-- HERO CAROUSEL -->
+      <section class="relative overflow-hidden border-b border-[#AE875B]/25">
+        <div class="relative min-h-[620px] sm:min-h-[680px] lg:min-h-[720px]">
+          @for (slide of heroSlides; track $index) {
+            <div class="absolute inset-0 transition-opacity duration-700"
+                 [class.opacity-100]="activeHeroSlide() === $index"
+                 [class.opacity-0]="activeHeroSlide() !== $index"
+                 [class.pointer-events-none]="activeHeroSlide() !== $index">
+              <img [src]="slide.image" [alt]="slide.alt" class="absolute inset-0 w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-gradient-to-r from-[#0D131A]/95 via-[#0D131A]/55 to-[#0D131A]/20"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A]/80 via-transparent to-[#0D131A]/35"></div>
+
+              <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[620px] sm:min-h-[680px] lg:min-h-[720px] flex items-center">
+                <div class="max-w-3xl py-20 text-center lg:text-left">
+                  <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151F2A]/90 border border-[#AE875B]/40 shadow-md text-xs font-semibold text-white backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-[#00A7D4]"></span>
+                    <span class="text-[#C9A87C] uppercase tracking-wider font-bold">{{ slide.eyebrow }}</span>
+                  </div>
+
+                  <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight mt-6">
+                    {{ slide.title }} <span class="text-[#C9A87C] italic">{{ slide.highlight }}</span>
+                  </h1>
+                  <p class="text-base sm:text-lg text-stone-200 max-w-2xl font-sans leading-relaxed mt-6 mx-auto lg:mx-0">{{ slide.description }}</p>
+
+                  <div class="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <a routerLink="/catalogo"
+                       class="w-full sm:w-auto px-8 py-4 bg-[#00A7D4] hover:bg-[#008AA0] text-white font-semibold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                      <span class="material-icons text-lg">storefront</span>
+                      Explorar Catálogo
+                    </a>
+                  </div>
+
+                  <div class="mt-8 pt-6 border-t border-white/15 max-w-lg mx-auto lg:mx-0">
+                    <p class="text-xl sm:text-2xl font-serif font-bold text-[#C9A87C]">Tekit</p>
+                    <p class="text-[11px] text-stone-300 font-medium uppercase tracking-wider">Hecho a Mano</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           }
-          <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/75 to-[#0D131A]/90"></div>
-          <!-- <div class="absolute inset-0 bg-[#0D131A]/40"></div> -->
-        </div>
-        <div class="absolute top-10 right-10 w-96 h-96 bg-[#AE875B]/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-10 left-10 w-96 h-96 bg-[#00A7D4]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            
-            <!-- Left Hero Text -->
-            <div class="lg:col-span-7 text-center lg:text-left space-y-6">
-              
-              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#151F2A] border border-[#AE875B]/40 shadow-md text-xs font-semibold text-white">
-                <span class="w-2 h-2 rounded-full bg-[#00A7D4] animate-pulse"></span>
-                <span class="text-[#C9A87C] uppercase tracking-wider font-bold">Tekit, Yucatán</span>
-                <span class="text-stone-600">|</span>
-                <span class="text-stone-300">Capital Mundial de la Guayabera</span>
-              </div>
+          <button type="button" (click)="previousHeroSlide()" aria-label="Slide anterior"
+                  class="absolute z-20 left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#0D131A]/70 hover:bg-[#0D131A] border border-white/20 text-white backdrop-blur-md transition-colors flex items-center justify-center">
+            <span class="material-icons">chevron_left</span>
+          </button>
+          <button type="button" (click)="nextHeroSlide()" aria-label="Siguiente slide"
+                  class="absolute z-20 right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#0D131A]/70 hover:bg-[#0D131A] border border-white/20 text-white backdrop-blur-md transition-colors flex items-center justify-center">
+            <span class="material-icons">chevron_right</span>
+          </button>
 
-              <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.15] tracking-tight">
-                El Arte de la <span class="text-[#C9A87C] italic">Elegancia</span> y la Tradición Yucateca
-              </h1>
-
-              <p class="text-base sm:text-lg text-stone-300 max-w-2xl font-sans leading-relaxed">
-                Alta costura tradicional por <strong class="text-white">Alan Uicab Medina</strong>. Guayaberas elegantes con bordados en punto de cruz de alta calidad ideales para cualquier ocasión y con el sello de personalidad que caracteriza a Guayaberas ALUM.
-              </p>
-
-              <!-- CTA Buttons -->
-              <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <a routerLink="/catalogo" 
-                   class="w-full sm:w-auto px-8 py-4 bg-[#00A7D4] hover:bg-[#008AA0] text-white font-semibold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                  <span class="material-icons text-lg">storefront</span>
-                  Explorar Catálogo
-                </a>
-
-                <!-- <a routerLink="/maintenance" 
-                   class="w-full sm:w-auto px-8 py-4 bg-[#151F2A] hover:bg-[#1C2938] text-white border border-[#AE875B]/40 hover:border-[#AE875B] font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-                  <span class="material-icons text-lg text-[#C9A87C]">design_services</span>
-                  maintenance
-                </a> -->
-              </div>
-
-              <!-- Key Value Metrics / Guarantees -->
-              <div class="pt-6 grid grid-cols-3 gap-4 border-t border-stone-800 max-w-lg mx-auto lg:mx-0">
-                <!-- <div class="text-center lg:text-left">
-                  <p class="text-xl sm:text-2xl font-serif font-bold text-white">100%</p>
-                  <p class="text-[11px] text-stone-400 font-medium uppercase tracking-wider">Lino Fino</p>
-                </div>
-                <div class="text-center lg:text-left">
-                  <p class="text-xl sm:text-2xl font-serif font-bold text-[#38C7EC]">+120</p>
-                  <p class="text-[11px] text-stone-400 font-medium uppercase tracking-wider">Alforzas x Pieza</p>
-                </div> -->
-                <div class="text-center lg:text-left">
-                  <p class="text-xl sm:text-2xl font-serif font-bold text-[#C9A87C]">Tekit</p>
-                  <p class="text-[11px] text-stone-400 font-medium uppercase tracking-wider">Hecho a Mano</p>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Right Hero Visual Showcase -->
-            <div class="lg:col-span-5 relative">
-              <div class="relative mx-auto max-w-md lg:max-w-none">
-                
-                <!-- Main Image Card -->
-                <div class="relative bg-[#151F2A] p-3 sm:p-4 rounded-3xl border border-[#AE875B]/40 shadow-2xl overflow-hidden">
-                  <img [src]="images.home.heroShowcase" 
-                       alt="Guayabera de Gala ALUM Tekit" 
-                       class="w-full h-[400px] sm:h-[480px] object-cover rounded-2xl" />
-                  
-                  <!-- Floating Badge overlay -->
-                  <div class="absolute bottom-6 left-6 right-6 bg-[#0D131A]/95 backdrop-blur-md p-4 rounded-2xl border border-[#AE875B]/40 shadow-xl">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-[#00A7D4]">Edición Presidencial</span>
-                        <h4 class="font-serif font-bold text-sm text-white">Lino Italiano & Alforzas Finas</h4>
-                      </div>
-                      <span class="text-sm font-bold text-[#C9A87C]">$2,450 MXN</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Floating Accent Card -->
-                <div class="hidden sm:flex absolute -top-4 -left-6 bg-[#151F2A]/95 backdrop-blur-md p-3.5 rounded-2xl border border-[#AE875B]/40 shadow-2xl items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-[#AE875B]/20 text-[#C9A87C] flex items-center justify-center">
-                    <span class="material-icons text-xl">verified</span>
-                  </div>
-                  <div>
-                    <p class="text-xs font-bold text-white">Auténtico Tekit, Yuc.</p>
-                    <p class="text-[10px] text-stone-300">Alan Uicab Medina</p>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
+          <div class="absolute z-20 bottom-7 left-1/2 -translate-x-1/2 flex items-center gap-2">
+            @for (slide of heroSlides; track $index) {
+              <button type="button" (click)="goToHeroSlide($index)" [attr.aria-label]="'Ir al slide ' + ($index + 1)"
+                      class="h-2.5 rounded-full transition-all duration-300"
+                      [class.w-8]="activeHeroSlide() === $index"
+                      [class.w-2.5]="activeHeroSlide() !== $index"
+                      [class.bg-[#00A7D4]]="activeHeroSlide() === $index"
+                      [class.bg-white/50]="activeHeroSlide() !== $index"></button>
+            }
           </div>
         </div>
       </section>
@@ -198,9 +147,15 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
             @for (category of categoryCards(); track category.key) {
               <a routerLink="/catalogo" [queryParams]="{cat: category.department}"
                  class="group relative h-96 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-stone-800 hover:border-[#AE875B]/60 transition-all duration-300">
-                <img [src]="category.image"
-                     [alt]="category.alt"
-                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                @if (category.image) {
+                  <img [src]="category.image"
+                       [alt]="category.alt"
+                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                } @else {
+                  <div class="w-full h-full bg-[#151F2A] flex items-center justify-center" role="img" [attr.aria-label]="category.alt">
+                    <span class="material-icons text-7xl text-[#C9A87C]/55 group-hover:text-[#C9A87C]/80 group-hover:scale-105 transition-all duration-300">shopping_bag</span>
+                  </div>
+                }
                 <div class="absolute inset-0 bg-gradient-to-t from-[#0D131A] via-[#0D131A]/40 to-transparent"></div>
 
                 <div class="absolute inset-x-5 bottom-5 text-white">
@@ -240,7 +195,7 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
       </section>
 
       <!-- ALUM TRADITION & TEKIT WORKSHOP PROMISE BANNER -->
-      <section class="py-16 bg-[#090D12] border-y border-[#AE875B]/25 relative overflow-hidden">
+      <section class="py-16 bg-[#090D12] border-y border-[#AE875B]/25 relative overflow-hidden" hidden>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="bg-[#151F2A] rounded-3xl p-8 sm:p-12 border border-[#AE875B]/30 shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             
@@ -392,9 +347,37 @@ const HOME_CATEGORY_PRESENTATION: Record<string, Omit<HomeCategoryCard, 'key' | 
     </main>
   `
 })
-export class Home {
+export class Home implements OnDestroy {
   private productService = inject(ProductService);
   readonly images = environment.images;
+  readonly activeHeroSlide = signal(0);
+  readonly heroSlides = [
+    {
+      eyebrow: 'Tekit, Yucatán · Capital Mundial de la Guayabera',
+      title: 'El Arte de la Elegancia y la',
+      highlight: 'Tradición Yucateca',
+      description: 'Alta costura tradicional por Alan Uicab Medina. Guayaberas elegantes con el sello de personalidad que caracteriza a Guayaberas ALUM.',
+      image: this.images.home.heroSlides.slide1 || this.images.home.heroBackground || this.images.home.heroShowcase,
+      alt: 'Tradición yucateca de Guayaberas ALUM'
+    },
+    {
+      eyebrow: 'Confección artesanal',
+      title: 'Detalles que distinguen cada',
+      highlight: 'Guayabera ALUM',
+      description: 'Prendas elaboradas con atención al detalle, acabados elegantes y la experiencia artesanal de Tekit, Yucatán.',
+      image: this.images.home.heroSlides.slide2,
+      alt: 'Detalle artesanal de una prenda ALUM'
+    },
+    {
+      eyebrow: 'Hecho en Tekit, Yucatán',
+      title: 'Tradición que se transforma en',
+      highlight: 'Elegancia',
+      description: 'Descubre piezas para ocasiones especiales y para vestir con frescura, identidad y estilo todos los días.',
+      image: this.images.home.heroSlides.slide3,
+      alt: 'Proceso artesanal de Guayaberas ALUM'
+    }
+  ];
+  private heroTimer = setInterval(() => this.nextHeroSlide(), 6500);
 
   constructor() {
     // Refresco comercial con ventana de frescura. Si GuayaFlow responde 403/503,
@@ -406,6 +389,22 @@ export class Home {
     });
   }
 
+  ngOnDestroy(): void {
+    clearInterval(this.heroTimer);
+  }
+
+  previousHeroSlide(): void {
+    this.activeHeroSlide.update(index => (index - 1 + this.heroSlides.length) % this.heroSlides.length);
+  }
+
+  nextHeroSlide(): void {
+    this.activeHeroSlide.update(index => (index + 1) % this.heroSlides.length);
+  }
+
+  goToHeroSlide(index: number): void {
+    this.activeHeroSlide.set(index);
+  }
+
   readonly categoryCards = computed<HomeCategoryCard[]>(() => {
     const categories = new Map<string, { department: string; image?: string }>();
 
@@ -415,9 +414,16 @@ export class Home {
 
       const key = this.categoryKey(department);
       if (!categories.has(key)) {
+        // La tarjeta representa el primer producto recibido por la API para el
+        // departamento. Se usa únicamente una imagen real de GuayaFlow; no el
+        // fallback visual que ProductService aplica a las fichas de producto.
+        const apiImages = product.rawApi?.images_url || [];
+        const firstProductImage = apiImages.find(Boolean)
+          || product.rawApi?.color_images?.flatMap(color => color.images_url || []).find(Boolean);
+
         categories.set(key, {
           department,
-          image: product.images?.find(Boolean)
+          image: firstProductImage || undefined
         });
       }
     }
@@ -430,7 +436,8 @@ export class Home {
           return {
             key,
             department: source.department,
-            ...presentation
+            ...presentation,
+            image: source.image
           };
         }
 
@@ -440,7 +447,7 @@ export class Home {
           title: source.department.toLocaleUpperCase('es-MX'),
           eyebrow: 'Colección ALUM',
           description: `Descubre nuestra colección de ${source.department}.`,
-          image: source.image || 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=1000&auto=format&fit=crop',
+          image: source.image,
           alt: `Colección ${source.department}`,
           accentClass: 'text-[#C9A87C]',
           hoverClass: 'group-hover:text-[#00A7D4]',
