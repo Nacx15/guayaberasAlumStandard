@@ -535,7 +535,7 @@ import { firstValueFrom } from 'rxjs';
                 <div>
                   <label for="checkout-country" class="block text-xs font-bold text-stone-200 mb-1">País *</label>
                   <div class="flex items-center gap-2">
-                    <input id="checkout-country"
+                    <input id="checkout-country" disabled
                            type="text" 
                            [value]="country()"
                            (input)="country.set($any($event.target).value)"
@@ -735,7 +735,7 @@ export class Checkout {
   city = signal('');
   state = signal('');
   postalCode = signal('');
-  country = signal('');
+  country = signal('MX');
 
   // Payment Method Selection: 'mercado_pago' | 'whatsapp'
   paymentMethod = signal<string>('mercado_pago');
@@ -1128,7 +1128,7 @@ export class Checkout {
             || !response.order_status_url
           ) {
             this.isProcessing.set(false);
-            this.toastService.show('Se devolvió una preferencia incompleta. No se realizó el redirect.', 'error', 6500);
+            this.toastService.show('Se devolvió una preferencia incompleta. No se realizó la redirección.', 'error', 6500);
             return;
           }
 

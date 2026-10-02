@@ -31,7 +31,7 @@ export const routes: Routes = [
   // Storefront protegido por estado autoritativo de GuayaFlow.
   { path: '', component: Home, canActivate: [ecommerceStatusGuard], title: 'GUAYABERAS ALUM | Alta Costura Yucateca - Tekit' },
   { path: 'inicio', component: Home, canActivate: [ecommerceStatusGuard], title: 'GUAYABERAS ALUM | Inicio' },
-  { path: 'nosotros', component: Nosotros, canActivate: [ecommerceStatusGuard], title: 'Historia & Tradición | GUAYABERAS ALUM' },
+  // { path: 'nosotros', component: Nosotros, canActivate: [ecommerceStatusGuard], title: 'Historia & Tradición | GUAYABERAS ALUM' },
   { path: 'servicios', component: Servicios, canActivate: [ecommerceStatusGuard], title: 'Servicios de Sastrería & Mayoreo | GUAYABERAS ALUM' },
   { path: 'catalogo', component: Catalogo, canActivate: [ecommerceStatusGuard], title: 'Catálogo de Lino & Tienda | GUAYABERAS ALUM' },
   { path: 'producto/:id', component: ProductoDetalle, canActivate: [ecommerceStatusGuard], title: 'Detalle de Prenda | GUAYABERAS ALUM' },
